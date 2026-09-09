@@ -173,8 +173,12 @@ function render() {
     ? `<b>${br(selectedDate)}</b><br>${selectedTime}`
     : "Selecione um horário.";
 
+  const selectedReservations = reservations.filter(
+    r => r.reservation_date === key(selectedDate)
+  );
+
   listEl.innerHTML =
-    reservations.map(r => `
+    selectedReservations.map(r => `
       <div class="reservation">
         <b>${r.reservation_date.split("-").reverse().join("/")}</b>
         · ${r.start_time.slice(0,5)}
@@ -182,7 +186,7 @@ function render() {
         <br><button type="button" class="cancel" data-id="${r.id}">Cancelar</button>
       </div>
     `).join("")
-    || '<span class="muted">Nenhuma reserva.</span>';
+    || '<span class="muted">Nenhuma reserva para este dia.</span>';
 
   listEl.querySelectorAll(".cancel").forEach(button => {
     button.addEventListener("click", async () => {
