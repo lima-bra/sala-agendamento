@@ -147,6 +147,10 @@ button{cursor:pointer}
   box-shadow:0 10px 22px rgba(116,59,57,.17)
 }
 .confirm:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.confirm-area{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.confirm-hint{font-size:11px;line-height:1.45;color:var(--muted);margin-bottom:9px}
+.confirm-area.ready .confirm-hint{color:var(--wine);font-weight:650}
+.confirm-area:not(.ready) .confirm{display:none}
 .msg{margin-top:11px;border-radius:12px;padding:11px 12px;font-size:12px;display:none}
 .msg.show{display:block}.msg.ok{background:#edf7f1;color:var(--ok)}.msg.err{background:#fff0ef;color:var(--danger)}
 
@@ -198,6 +202,7 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
   .day{min-height:40px;font-size:12px}
   .slots{grid-template-columns:repeat(2,1fr)}
   .side-panel{grid-column:auto;min-height:auto}
+  .confirm-area{margin-top:18px}
 }
 @media(max-width:420px){
   .brandbar{min-height:98px;padding:17px 10px}
@@ -215,37 +220,37 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
 <div class="page">
   <header class="brandbar">
     <div class="brand-title">
-      <small>Agendamento</small>
+      <small>Agendamento de sala</small>
       <h1>MOVIMENTE</h1>
       <div class="brand-accent"></div>
-      <p>Sua saúde em movimento</p>
+      <p>Organização dos atendimentos</p>
     </div>
   </header>
 
   <main class="layout">
     <aside class="card sidebar">
       <div class="welcome">
-        <h2>Bem-vindo(a)!</h2>
-        <p>Agende seu horário e cuide da sua saúde.</p>
+        <h2>Área do profissional</h2>
+        <p>Agende a sala para sua terapia.</p>
       </div>
       <nav class="menu" aria-label="Menu">
         <button type="button" data-scroll="agenda">
           <div class="icon">📅</div>
-          <div><strong>Agendar horário</strong><span>Escolha o melhor dia e horário para o seu atendimento.</span></div>
+          <div><strong>Agendar horário</strong><span>Escolha o melhor dia e horário para utilizar a sala.</span></div>
           <div class="arrow">›</div>
         </button>
         <button type="button" data-scroll="cancel">
           <div class="icon">×</div>
-          <div><strong>Cancelar agendamento</strong><span>Use o e-mail informado na reserva.</span></div>
+          <div><strong>Cancelar agendamento</strong><span>Cancele uma reserva usando o e-mail informado.</span></div>
           <div class="arrow">›</div>
         </button>
         <button type="button" data-scroll="info">
           <div class="icon">i</div>
-          <div><strong>Informações</strong><span>Confira horários, regras e demais informações.</span></div>
+          <div><strong>Informações</strong><span>Consulte horários, regras e disponibilidade da sala.</span></div>
           <div class="arrow">›</div>
         </button>
       </nav>
-      <div class="side-note" id="info">Atendimento em uma única sala. Sábados e domingos não possuem horários disponíveis.</div>
+      <div class="side-note" id="info">Uma única sala está disponível para os atendimentos. Sábados e domingos não possuem horários disponíveis.</div>
     </aside>
 
     <section class="card main" id="agenda">
@@ -253,8 +258,8 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
         <div class="heading">
           <div class="heading-icon">📅</div>
           <div>
-            <h2>Agende seu horário</h2>
-            <p>Selecione a data desejada e escolha um horário disponível.</p>
+            <h2>Agendar sala</h2>
+            <p>Selecione a data e escolha um horário disponível para seu atendimento.</p>
           </div>
         </div>
         <div class="status">● Agenda online</div>
@@ -276,7 +281,6 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
           <span id="selectedDateLabel">Selecione uma data</span>
         </div>
         <div class="slots" id="slots"></div>
-        <button class="confirm" id="reserve" type="button" disabled>Confirmar horário →</button>
         <div class="msg" id="msg"></div>
       </div>
     </section>
@@ -292,22 +296,28 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
         </div>
       </div>
       <div class="panel-body">
-        <h2>Confirmar reserva</h2>
-        <p>Após escolher o horário, informe seu nome e o e-mail usado na reserva.</p>
+        <h2>Dados da reserva</h2>
+        <p>Após escolher o horário, informe seu nome e o e-mail utilizado na reserva.</p>
         <div class="summary" id="summary">
-          <div class="label">Horário selecionado</div>
+          <div class="label">Horário da sala</div>
           <strong>Selecione uma data e horário.</strong>
         </div>
 
-        <label for="name">Nome</label>
-        <input id="name" autocomplete="name" placeholder="Seu nome">
+        <label for="name">Profissional</label>
+        <input id="name" autocomplete="name" placeholder="Nome do profissional">
 
         <label for="email">E-mail</label>
         <input id="email" type="email" autocomplete="email" placeholder="seu@email.com">
 
+        <div class="confirm-area" id="confirmArea" aria-live="polite">
+          <div class="confirm-hint" id="confirmHint">Selecione um horário e preencha seus dados para confirmar.</div>
+          <button class="confirm" id="reserve" type="button" disabled>Confirmar agendamento →</button>
+        </div>
+        <div class="msg" id="msg"></div>
+
         <div class="reserve-list">
-          <h3>Reservas do dia</h3>
-          <div id="list"><span class="empty">Nenhuma reserva para este dia.</span></div>
+          <h3>Reservas da sala no dia</h3>
+          <div id="list"><span class="empty">Nenhuma reserva para esta data.</span></div>
         </div>
       </div>
     </aside>
@@ -327,6 +337,8 @@ const summaryEl = document.getElementById("summary");
 const nameEl = document.getElementById("name");
 const emailEl = document.getElementById("email");
 const reserveEl = document.getElementById("reserve");
+const confirmAreaEl = document.getElementById("confirmArea");
+const confirmHintEl = document.getElementById("confirmHint");
 const msgEl = document.getElementById("msg");
 const listEl = document.getElementById("list");
 
@@ -389,7 +401,7 @@ function renderSlots(){
     selectedDateLabelEl.textContent="Selecione uma data";
     slotsEl.innerHTML=`<span class="empty">Escolha uma data no calendário.</span>`;
     reserveEl.disabled=true;
-    summaryEl.innerHTML=`<div class="label">Horário selecionado</div><strong>Selecione uma data e horário.</strong>`;
+    summaryEl.innerHTML=`<div class="label">Horário da sala</div><strong>Selecione uma data e horário.</strong>`;
     return;
   }
 
@@ -416,17 +428,35 @@ function renderSlots(){
     });
   });
 
-  reserveEl.disabled=!selectedTime;
+  updateConfirmState();
   renderSummary();
+}
+
+function updateConfirmState(){
+  const hasDateTime=Boolean(selectedDate && selectedTime);
+  const hasProfessional=nameEl.value.trim().length>0;
+  const hasEmail=emailEl.value.trim().length>0 && emailEl.checkValidity();
+  const ready=hasDateTime && hasProfessional && hasEmail;
+
+  confirmAreaEl.classList.toggle("ready",ready);
+  reserveEl.disabled=!ready;
+
+  if(!hasDateTime){
+    confirmHintEl.textContent="Primeiro, selecione a data e o horário da sala.";
+  }else if(!hasProfessional || !hasEmail){
+    confirmHintEl.textContent="Agora informe o nome e o e-mail do profissional para confirmar.";
+  }else{
+    confirmHintEl.textContent="Tudo pronto. Confirme o agendamento da sala.";
+  }
 }
 
 function renderSummary(){
   if(selectedDate && selectedTime){
-    summaryEl.innerHTML=`<div class="label">Horário selecionado</div><strong>${formatDate(selectedDate)} · ${selectedTime}</strong>`;
+    summaryEl.innerHTML=`<div class="label">Horário da sala</div><strong>${formatDate(selectedDate)} · ${selectedTime}</strong>`;
   }else if(selectedDate){
     summaryEl.innerHTML=`<div class="label">Data selecionada</div><strong>${formatDate(selectedDate)}</strong>`;
   }else{
-    summaryEl.innerHTML=`<div class="label">Horário selecionado</div><strong>Selecione uma data e horário.</strong>`;
+    summaryEl.innerHTML=`<div class="label">Horário da sala</div><strong>Selecione uma data e horário.</strong>`;
   }
 
   const selectedReservations=selectedDate ? reservations.filter(r=>r.reservation_date===key(selectedDate)) : [];
@@ -435,7 +465,7 @@ function renderSummary(){
       <b>${r.start_time.slice(0,5)}</b> · ${escapeHtml(r.name)}
       <br><button type="button" class="cancel" data-id="${r.id}">Cancelar</button>
     </div>
-  `).join("") || `<span class="empty">Nenhuma reserva para este dia.</span>`;
+  `).join("") || `<span class="empty">Nenhuma reserva para esta data.</span>`;
 
   listEl.querySelectorAll(".cancel").forEach(btn=>{
     btn.addEventListener("click",()=>cancelReservation(btn.dataset.id,btn));
@@ -458,6 +488,9 @@ document.getElementById("nextMonth").addEventListener("click",()=>{
   selectedDate=null; selectedTime=null; clearMessage(); render();
 });
 
+nameEl.addEventListener("input", updateConfirmState);
+emailEl.addEventListener("input", updateConfirmState);
+
 document.querySelectorAll("[data-scroll]").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.getElementById(btn.dataset.scroll)?.scrollIntoView({behavior:"smooth",block:"start"});
@@ -469,7 +502,7 @@ reserveEl.addEventListener("click", async ()=>{
   if(!selectedDate || !selectedTime){message("Selecione a data e o horário.");return;}
   if(isWeekend(selectedDate)){message("Não é possível agendar aos sábados e domingos.");return;}
   const name=nameEl.value.trim(), email=emailEl.value.trim().toLowerCase();
-  if(!name || !email){message("Informe nome e e-mail.");return;}
+  if(!name || !email){message("Informe o nome do profissional e o e-mail.");return;}
 
   const now=new Date();
   if(key(selectedDate)===key(now)){
@@ -495,15 +528,15 @@ reserveEl.addEventListener("click", async ()=>{
   }catch(error){
     console.error(error); message("Erro inesperado ao fazer a reserva.");
   }finally{
-    reserveEl.disabled=!selectedDate || !selectedTime;
-    reserveEl.textContent="Confirmar horário →";
+    reserveEl.textContent="Confirmar agendamento →";
+    updateConfirmState();
   }
 });
 
 async function cancelReservation(id,btn){
   const reservation=reservations.find(r=>r.id===id);
   if(!reservation) return;
-  const email=prompt(`Para cancelar a reserva de ${reservation.name}, informe o e-mail usado na reserva:`);
+  const email=prompt(`Para cancelar a reserva de ${reservation.name}, informe o e-mail utilizado na reserva:`);
   if(email===null) return;
   const normalized=email.trim().toLowerCase();
   if(!normalized){message("Informe o e-mail usado na reserva.");return;}
@@ -530,6 +563,7 @@ async function load(){
 }
 
 render();
+updateConfirmState();
 load();
 
 db.channel("reservas")
