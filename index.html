@@ -14,7 +14,7 @@ body{font-family:system-ui;margin:0;background:#f5f7fb;color:#172033}.wrap{max-w
 <script>
 const SUPABASE_URL="https://yazwurspiuviohxyyjgt.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_X_vbBWPoBwTnjdzsKx47HA_CUeHwtxA";
-const db=SUPABASE_URL.startsWith("https://")&&SUPABASE_ANON_KEY.startsWith("ey")?supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY):null;
+const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
 const times=["08:00","09:00","10:00","11:00","13:00","14:00","15:00","16:00","17:00"];
 const base=new Date();base.setHours(0,0,0,0);const dates=[0,1,2,3,4].map(i=>{let d=new Date(base);d.setDate(d.getDate()+i);return d});
 let selectedDate=dates[0],selectedTime=null,res=[];
