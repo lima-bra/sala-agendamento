@@ -11,22 +11,210 @@ body{font-family:system-ui;margin:0;background:#f5f7fb;color:#172033}.wrap{max-w
 <aside class="card"><h3>Confirmar reserva</h3><div id="summary" class="summary">Selecione um horário.</div>
 <label>Nome</label><input id="name" placeholder="Maria Silva"><label>E-mail</label><input id="email" type="email" placeholder="maria@email.com">
 <button id="reserve" class="primary">Reservar horário</button><div id="msg"></div><h3>Reservas</h3><div id="list"></div></aside></div></div>
-<script>
-const SUPABASE_URL="https://yazwurspiuviohxyyjgt.supabase.co";
-const SUPABASE_ANON_KEY="sb_publishable_X_vbBWPoBwTnjdzsKx47HA_CUeHwtxA";
-const db=supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
-const times=["08:00","09:00","10:00","11:00","13:00","14:00","15:00","16:00","17:00"];
-const base=new Date();base.setHours(0,0,0,0);const dates=[0,1,2,3,4].map(i=>{let d=new Date(base);d.setDate(d.getDate()+i);return d});
-let selectedDate=dates[0],selectedTime=null,res=[];
-const key=d=>d.toISOString().slice(0,10), br=d=>d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
-function message(t,ok=false){msg.className="msg "+(ok?"ok":"err");msg.textContent=t}
-function render(){days.innerHTML=dates.map((d,i)=>`<button class="day ${key(d)==key(selectedDate)?"active":""}" onclick="pickDate(${i})">${i?"":"Hoje"}<br>${br(d)}</button>`).join("");
-slots.innerHTML=times.map(t=>{let busy=res.some(r=>r.reservation_date==key(selectedDate)&&r.start_time.slice(0,5)==t);return `<button class="slot ${busy?"busy":""} ${selectedTime==t?"selected":""}" ${busy?"disabled":""} onclick="pickTime('${t}')">${busy?"Reservado":t}</button>`}).join("");
-summary.innerHTML=selectedTime?`<b>${br(selectedDate)}</b><br>${selectedTime}`:"Selecione um horário.";
-list.innerHTML=res.map(r=>`<div class="reservation"><b>${r.reservation_date.split("-").reverse().join("/")}</b> · ${r.start_time.slice(0,5)}<br>${r.name}</div>`).join("")||'<span class="muted">Nenhuma reserva.</span>'}
-function pickDate(i){selectedDate=dates[i];selectedTime=null;render()} function pickTime(t){selectedTime=t;msg.textContent="";render()}
-async function load(){if(!db){message("Configure SUPABASE_URL e SUPABASE_ANON_KEY no arquivo.");render();return}let q=await db.from("reservations").select("reservation_date,start_time,name").order("reservation_date").order("start_time");if(q.error)message(q.error.message);else{res=q.data||[];render()}}
-reserve.onclick=async()=>{if(!db)return load();let n=name.value.trim(),e=email.value.trim();if(!selectedTime)return message("Selecione um horário.");if(!n||!e)return message("Informe nome e e-mail.");let q=await db.from("reservations").insert({room_id:1,reservation_date:key(selectedDate),start_time:selectedTime+":00",name:n,email:e});if(q.error){message(q.error.code==="23505"?"Esse horário já foi reservado.":q.error.message);return}message("Reserva confirmada!",true);name.value=email.value="";selectedTime=null;load()}
-if(db)db.channel("reservas").on("postgres_changes",{event:"*",schema:"public",table:"reservations"},load).subscribe();
-render();load();
-</script></body></html>
+const SUPABASE_URL = "https://yazwurspiuviohxyyjgt.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_X_vbBWPoBwTnjdzsKx47HA_CUeHwtxA";
+
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY
+);
+
+const daysEl = document.getElementById("days");
+const slotsEl = document.getElementById("slots");
+const summaryEl = document.getElementById("summary");
+const nameEl = document.getElementById("name");
+const emailEl = document.getElementById("email");
+const reserveEl = document.getElementById("reserve");
+const msgEl = document.getElementById("msg");
+const listEl = document.getElementById("list");
+
+const times = [
+  "08:00","09:00","10:00","11:00",
+  "13:00","14:00","15:00","16:00","17:00"
+];
+
+const base = new Date();
+base.setHours(0,0,0,0);
+
+const dates = [0,1,2,3,4].map(i => {
+  const d = new Date(base);
+  d.setDate(d.getDate() + i);
+  return d;
+});
+
+let selectedDate = dates[0];
+let selectedTime = null;
+let reservations = [];
+
+const key = d => d.toISOString().slice(0,10);
+
+const br = d =>
+  d.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit"
+  });
+
+function message(text, ok = false) {
+  msgEl.className = "msg " + (ok ? "ok" : "err");
+  msgEl.textContent = text;
+}
+
+function render() {
+
+  daysEl.innerHTML = dates.map((d, i) => `
+    <button
+      class="day ${key(d) === key(selectedDate) ? "active" : ""}"
+      data-day="${i}">
+      ${i === 0 ? "Hoje" : ""}<br>${br(d)}
+    </button>
+  `).join("");
+
+  daysEl.querySelectorAll(".day").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedDate = dates[Number(button.dataset.day)];
+      selectedTime = null;
+      msgEl.textContent = "";
+      render();
+    });
+  });
+
+  slotsEl.innerHTML = times.map(t => {
+
+    const busy = reservations.some(
+      r =>
+        r.reservation_date === key(selectedDate) &&
+        r.start_time.slice(0,5) === t
+    );
+
+    return `
+      <button
+        class="slot ${busy ? "busy" : ""} ${selectedTime === t ? "selected" : ""}"
+        data-time="${t}"
+        ${busy ? "disabled" : ""}>
+        ${busy ? "Reservado" : t}
+      </button>
+    `;
+
+  }).join("");
+
+  slotsEl.querySelectorAll(".slot:not(:disabled)").forEach(button => {
+    button.addEventListener("click", () => {
+      selectedTime = button.dataset.time;
+      msgEl.textContent = "";
+      render();
+    });
+  });
+
+  summaryEl.innerHTML = selectedTime
+    ? `<b>${br(selectedDate)}</b><br>${selectedTime}`
+    : "Selecione um horário.";
+
+  listEl.innerHTML =
+    reservations.map(r => `
+      <div class="reservation">
+        <b>${r.reservation_date.split("-").reverse().join("/")}</b>
+        · ${r.start_time.slice(0,5)}
+        <br>${r.name}
+      </div>
+    `).join("")
+    || '<span class="muted">Nenhuma reserva.</span>';
+}
+
+async function load() {
+
+  const result = await db
+    .from("reservations")
+    .select("reservation_date,start_time,name")
+    .order("reservation_date")
+    .order("start_time");
+
+  if (result.error) {
+    console.error(result.error);
+    message("Erro ao carregar reservas: " + result.error.message);
+    render();
+    return;
+  }
+
+  reservations = result.data || [];
+  render();
+}
+
+reserveEl.addEventListener("click", async () => {
+
+  msgEl.textContent = "";
+
+  const name = nameEl.value.trim();
+  const email = emailEl.value.trim();
+
+  if (!selectedTime) {
+    message("Selecione um horário.");
+    return;
+  }
+
+  if (!name || !email) {
+    message("Informe nome e e-mail.");
+    return;
+  }
+
+  reserveEl.disabled = true;
+  reserveEl.textContent = "Reservando...";
+
+  try {
+
+    const result = await db
+      .from("reservations")
+      .insert({
+        room_id: 1,
+        reservation_date: key(selectedDate),
+        start_time: selectedTime + ":00",
+        name: name,
+        email: email
+      });
+
+    if (result.error) {
+
+      console.error(result.error);
+
+      if (result.error.code === "23505") {
+        message("Esse horário já foi reservado.");
+      } else {
+        message("Erro ao reservar: " + result.error.message);
+      }
+
+      return;
+    }
+
+    message("Reserva confirmada!", true);
+
+    nameEl.value = "";
+    emailEl.value = "";
+    selectedTime = null;
+
+    await load();
+
+  } catch (error) {
+
+    console.error(error);
+    message("Erro inesperado ao fazer a reserva.");
+
+  } finally {
+
+    reserveEl.disabled = false;
+    reserveEl.textContent = "Reservar horário";
+  }
+});
+
+render();
+load();
+
+db.channel("reservas")
+  .on(
+    "postgres_changes",
+    {
+      event: "*",
+      schema: "public",
+      table: "reservations"
+    },
+    () => load()
+  )
+  .subscribe();</body></html>
