@@ -140,13 +140,22 @@ function render() {
         r.start_time.slice(0,5) === t
     );
 
+    // No dia de hoje, horários que já começaram ficam indisponíveis.
+    const now = new Date();
+    const isToday = key(selectedDate) === key(now);
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const [hour, minute] = t.split(":").map(Number);
+    const slotMinutes = hour * 60 + minute;
+    const passed = isToday && slotMinutes <= currentMinutes;
+    const unavailable = busy || passed;
+
     return `
       <button
         type="button"
-        class="slot ${busy ? "busy" : ""} ${selectedTime === t ? "selected" : ""}"
+        class="slot ${unavailable ? "busy" : ""} ${selectedTime === t ? "selected" : ""}"
         data-time="${t}"
-        ${busy ? "disabled" : ""}>
-        ${busy ? "Reservado" : t}
+        ${unavailable ? "disabled" : ""}>
+        ${busy ? "Reservado" : passed ? "Encerrado" : t}
       </button>
     `;
 
@@ -208,6 +217,20 @@ reserveEl.addEventListener("click", async () => {
 
   if (!name || !email) {
     message("Informe nome e e-mail.");
+    return;
+  }
+
+  // Segunda proteção: impede uma reserva mesmo se o estado da tela estiver desatualizado.
+  const now = new Date();
+  const isToday = key(selectedDate) === key(now);
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const [hour, minute] = selectedTime.split(":").map(Number);
+  const slotMinutes = hour * 60 + minute;
+
+  if (isToday && slotMinutes <= currentMinutes) {
+    message("Esse horário já passou.");
+    selectedTime = null;
+    render();
     return;
   }
 
