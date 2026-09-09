@@ -3,354 +3,415 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Agendamento - Reservas</title>
+<meta name="theme-color" content="#5b2944">
+<title>Agendamento MOVIMENTE</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-body{font-family:system-ui;margin:0;background:#f5f7fb;color:#172033}
-.wrap{max-width:1000px;margin:auto;padding:25px 16px}
-.grid{display:grid;grid-template-columns:1.4fr .8fr;gap:20px}
-@media(max-width:700px){.grid{grid-template-columns:1fr}}
-.card{background:#fff;padding:22px;border-radius:18px;border:1px solid #e4e8ee}
-.days,.slots{display:grid;gap:9px}
-.days{grid-template-columns:repeat(7,1fr);margin:18px 0}
-.slots{grid-template-columns:repeat(3,1fr)}
+:root{
+  --wine:#5b2944;
+  --wine-dark:#432035;
+  --rose:#a75b73;
+  --rose-light:#f4e3e7;
+  --cream:#fffaf7;
+  --paper:#ffffff;
+  --ink:#3e2633;
+  --muted:#806b75;
+  --line:#ead9df;
+  --ok:#2f7655;
+  --error:#a53d4d;
+  --shadow:0 14px 40px rgba(91,41,68,.12);
+}
+*{box-sizing:border-box}
+html{min-width:320px}
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 5% 0%, rgba(167,91,115,.14), transparent 28rem),
+    radial-gradient(circle at 100% 100%, rgba(167,91,115,.10), transparent 28rem),
+    var(--cream);
+}
 button,input{font:inherit}
-button{padding:11px;border-radius:10px;border:1px solid #d7dce4;background:#fff;cursor:pointer}
-button:disabled{cursor:not-allowed}
-.day.active,.slot.selected,.primary{background:#172033;color:white}
-.day.weekend{background:#f1f3f5;color:#929aa6}
-.slot.busy{background:#eef0f3;color:#8992a0;text-decoration:line-through}
-.primary{width:100%;border:0;margin-top:15px}
-.primary:disabled{opacity:.65}
-input{width:100%;padding:11px;border:1px solid #d7dce4;border-radius:9px;box-sizing:border-box;margin:5px 0 12px}
-.summary{padding:13px;background:#f6f8fa;border-radius:10px}
-.msg{padding:12px;margin-top:12px;border-radius:10px}
-.ok{background:#e8f7ee;color:#176b3a}
-.err{background:#fff0f0;color:#a12a2a}
-.muted{color:#697386}
-.reservation{padding:10px 0;border-bottom:1px solid #edf0f3}.cancel{margin-top:7px;padding:6px 9px;font-size:.9em;color:#a12a2a;border-color:#e7caca}
+button{cursor:pointer}
+.app{min-height:100vh}
+.header{
+  background:linear-gradient(135deg,var(--wine-dark),var(--wine));
+  color:#fff;
+  box-shadow:0 8px 24px rgba(67,32,53,.18);
+}
+.header-inner{
+  width:min(1180px,calc(100% - 32px));
+  margin:auto;
+  min-height:92px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+}
+.brand{display:flex;align-items:center;gap:14px;min-width:0}
+.brand img{width:72px;height:58px;object-fit:contain;filter:brightness(0) invert(1);opacity:.96}
+.brand-copy{min-width:0}
+.brand-title{font-size:clamp(1.15rem,2.2vw,1.65rem);font-weight:700;letter-spacing:.02em}
+.brand-sub{font-size:.86rem;opacity:.82;margin-top:2px}
+.main{
+  width:min(1180px,calc(100% - 32px));
+  margin:0 auto;
+  padding:32px 0 48px;
+}
+.hero{margin-bottom:24px}
+.hero h1{margin:0;font-size:clamp(1.8rem,4vw,2.65rem);letter-spacing:-.03em}
+.hero p{margin:7px 0 0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(300px,.75fr);gap:22px;align-items:start}
+.card{
+  background:rgba(255,255,255,.94);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:24px;
+  box-shadow:var(--shadow);
+}
+.card h2,.card h3{margin:0 0 14px;color:var(--wine)}
+.muted{color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin:18px 0 24px}
+.day,.slot{
+  border:1px solid var(--line);
+  background:#fff;
+  color:var(--ink);
+  border-radius:12px;
+  transition:.15s ease;
+}
+.day{padding:10px 5px;line-height:1.3;min-height:62px;font-size:.86rem}
+.day:hover:not(:disabled),.slot:hover:not(:disabled){border-color:var(--rose);transform:translateY(-1px)}
+.day.active,.slot.selected,.primary{
+  background:var(--wine);
+  color:#fff;
+  border-color:var(--wine);
+}
+.day.weekend,.slot.busy{background:#f4f1f2;color:#a4999f;border-color:#e7e0e3}
+.slot.busy{text-decoration:line-through}
+.slots{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.slot{padding:12px 8px;min-height:46px;font-weight:600}
+label{display:block;font-size:.9rem;font-weight:650;margin:15px 0 6px}
+input{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:11px;
+  padding:12px 13px;
+  background:#fff;
+  color:var(--ink);
+  outline:none;
+}
+input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(167,91,115,.12)}
+.summary{
+  padding:14px 15px;
+  background:var(--rose-light);
+  border:1px solid #ead0d8;
+  border-radius:13px;
+  line-height:1.5;
+}
+.primary{
+  width:100%;
+  border:0;
+  margin-top:18px;
+  padding:13px 16px;
+  font-weight:700;
+}
+.primary:hover:not(:disabled){background:var(--wine-dark)}
+.primary:disabled{opacity:.55;cursor:not-allowed}
+.msg{padding:12px 14px;margin-top:13px;border-radius:11px}
+.ok{background:#e7f4ec;color:var(--ok)}
+.err{background:#fbeaec;color:var(--error)}
+.reservation{padding:12px 0;border-bottom:1px solid #f0e4e8}
+.cancel{margin-top:8px;padding:7px 10px;border:1px solid #e7cbd2;border-radius:9px;background:#fff;color:var(--error)}
+.footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 16px 30px}
+.decor{position:fixed;z-index:-1;pointer-events:none;width:260px;height:260px;border-radius:50%;border:45px solid rgba(167,91,115,.07);right:-100px;top:150px}
+@media(max-width:850px){
+  .grid{grid-template-columns:1fr}
+  .card{padding:20px}
+}
+@media(max-width:600px){
+  .header-inner,.main{width:min(100% - 20px,1180px)}
+  .header-inner{min-height:78px}
+  .brand img{width:58px;height:48px}
+  .brand-sub{font-size:.76rem}
+  .main{padding:22px 0 34px}
+  .hero{margin-bottom:18px}
+  .days{gap:5px}
+  .day{padding:8px 2px;font-size:.73rem;min-height:56px}
+  .slots{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:390px){
+  .card{padding:16px;border-radius:18px}
+  .day{font-size:.68rem}
+  .brand-title{font-size:1.05rem}
+  .brand-sub{display:none}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-<h2>Agendamento</h2>
+<div class="app">
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <img src="logo.png" alt="MOVIMENTE">
+        <div class="brand-copy">
+          <div class="brand-title">Agendamento MOVIMENTE</div>
+          <div class="brand-sub">Sua saúde em movimento</div>
+        </div>
+      </div>
+    </div>
+  </header>
 
-<div class="grid">
-<section class="card">
-<h1>Reserve seu horário</h1>
-<p class="muted">Os dados são compartilhados entre dispositivos.</p>
+  <main class="main">
+    <section class="hero">
+      <h1>Agendamento MOVIMENTE</h1>
+      <p>Escolha a data e reserve seu horário de atendimento.</p>
+    </section>
 
-<div id="days" class="days"></div>
-<h3>Horários</h3>
-<div id="slots" class="slots"></div>
-</section>
+    <div class="grid">
+      <section class="card">
+        <h2>Agende seu horário</h2>
+        <p class="muted">Selecione uma data e depois um horário disponível.</p>
+        <div id="days" class="days"></div>
+        <h3>Horários disponíveis</h3>
+        <div id="slots" class="slots"></div>
+      </section>
 
-<aside class="card">
-<h3>Confirmar reserva</h3>
-<div id="summary" class="summary">Selecione um horário.</div>
+      <aside class="card">
+        <h3>Confirmar agendamento</h3>
+        <div id="summary" class="summary">Selecione um horário.</div>
 
-<label for="name">Nome</label>
-<input id="name" placeholder="Maria Silva">
+        <label for="name">Nome</label>
+        <input id="name" autocomplete="name" placeholder="Seu nome">
 
-<label for="email">E-mail</label>
-<input id="email" type="email" placeholder="maria@email.com">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" autocomplete="email" placeholder="seu@email.com">
 
-<button id="reserve" class="primary">Reservar horário</button>
+        <button id="reserve" class="primary">Confirmar horário</button>
+        <div id="msg" aria-live="polite"></div>
 
-<div id="msg"></div>
+        <h3 style="margin-top:24px">Reservas do dia</h3>
+        <div id="list"></div>
+      </aside>
+    </div>
+  </main>
 
-<h3>Reservas</h3>
-<div id="list"></div>
-</aside>
-</div>
+  <div class="footer">MOVIMENTE · Sua saúde em movimento</div>
+  <div class="decor"></div>
 </div>
 
 <script>
 const SUPABASE_URL = "https://yazwurspiuviohxyyjgt.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_X_vbBWPoBwTnjdzsKx47HA_CUeHwtxA";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const db = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+const daysEl=document.getElementById("days");
+const slotsEl=document.getElementById("slots");
+const summaryEl=document.getElementById("summary");
+const nameEl=document.getElementById("name");
+const emailEl=document.getElementById("email");
+const reserveEl=document.getElementById("reserve");
+const msgEl=document.getElementById("msg");
+const listEl=document.getElementById("list");
 
-const daysEl = document.getElementById("days");
-const slotsEl = document.getElementById("slots");
-const summaryEl = document.getElementById("summary");
-const nameEl = document.getElementById("name");
-const emailEl = document.getElementById("email");
-const reserveEl = document.getElementById("reserve");
-const msgEl = document.getElementById("msg");
-const listEl = document.getElementById("list");
-
-const times = [
+const times=[
   "06:59","07:59","08:59","09:59","10:59",
   "11:59","12:59","13:59","14:59","15:59",
   "16:59","17:59","18:59","19:59","20:59"
 ];
 
-const base = new Date();
+const base=new Date();
 base.setHours(0,0,0,0);
-
-const dates = [0,1,2,3,4,5,6].map(i => {
-  const d = new Date(base);
-  d.setDate(d.getDate() + i);
+const dates=[0,1,2,3,4,5,6].map(i=>{
+  const d=new Date(base);
+  d.setDate(d.getDate()+i);
   return d;
 });
 
-let selectedDate = dates[0];
-let selectedTime = null;
-let reservations = [];
+let selectedDate=dates[0];
+let selectedTime=null;
+let reservations=[];
 
-const key = d => d.toISOString().slice(0,10);
+const key=d=>d.toISOString().slice(0,10);
+const br=d=>d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
+const weekday=d=>d.toLocaleDateString("pt-BR",{weekday:"short"}).replace(".","");
+const isWeekend=d=>[0,6].includes(d.getDay());
 
-const br = d => d.toLocaleDateString("pt-BR", {
-  day: "2-digit",
-  month: "2-digit"
-});
-
-const weekday = d => d.toLocaleDateString("pt-BR", {
-  weekday: "short"
-}).replace(".", "");
-
-const isWeekend = d => {
-  const day = d.getDay();
-  return day === 0 || day === 6;
-};
-
-function message(text, ok = false) {
-  msgEl.className = "msg " + (ok ? "ok" : "err");
-  msgEl.textContent = text;
+function message(text,ok=false){
+  msgEl.className="msg "+(ok?"ok":"err");
+  msgEl.textContent=text;
 }
 
-function render() {
+function render(){
+  daysEl.innerHTML=dates.map((d,i)=>`
+    <button type="button"
+      class="day ${key(d)===key(selectedDate)?"active":""} ${isWeekend(d)?"weekend":""}"
+      data-day="${i}" ${isWeekend(d)?"disabled":""}>
+      ${i===0?`Hoje · ${weekday(d)}`:weekday(d)}<br>${br(d)}
+    </button>`).join("");
 
-  daysEl.innerHTML = dates.map((d, i) => `
-    <button
-      type="button"
-      class="day ${key(d) === key(selectedDate) ? "active" : ""} ${isWeekend(d) ? "weekend" : ""}"
-      data-day="${i}"
-      ${isWeekend(d) ? "disabled" : ""}>
-      ${i === 0 ? `Hoje · ${weekday(d)}` : weekday(d)}<br>${br(d)}
-    </button>
-  `).join("");
-
-  daysEl.querySelectorAll(".day").forEach(button => {
-    button.addEventListener("click", () => {
-      selectedDate = dates[Number(button.dataset.day)];
-      selectedTime = null;
-      msgEl.textContent = "";
+  daysEl.querySelectorAll(".day").forEach(button=>{
+    button.addEventListener("click",()=>{
+      selectedDate=dates[Number(button.dataset.day)];
+      selectedTime=null;
+      msgEl.textContent="";
       render();
     });
   });
 
-  slotsEl.innerHTML = times.map(t => {
-
-    const weekend = isWeekend(selectedDate);
-
-    const busy = reservations.some(
-      r =>
-        r.reservation_date === key(selectedDate) &&
-        r.start_time.slice(0,5) === t
+  slotsEl.innerHTML=times.map(t=>{
+    const weekend=isWeekend(selectedDate);
+    const busy=reservations.some(r=>
+      r.reservation_date===key(selectedDate) && r.start_time.slice(0,5)===t
     );
-
-    // No dia de hoje, horários que já começaram ficam indisponíveis.
-    const now = new Date();
-    const isToday = key(selectedDate) === key(now);
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    const [hour, minute] = t.split(":").map(Number);
-    const slotMinutes = hour * 60 + minute;
-    const passed = isToday && slotMinutes <= currentMinutes;
-    const unavailable = weekend || busy || passed;
-
-    return `
-      <button
-        type="button"
-        class="slot ${unavailable ? "busy" : ""} ${selectedTime === t ? "selected" : ""}"
-        data-time="${t}"
-        ${unavailable ? "disabled" : ""}>
-        ${weekend ? "Fim de semana" : busy ? "Reservado" : passed ? "Encerrado" : t}
-      </button>
-    `;
-
+    const now=new Date();
+    const isToday=key(selectedDate)===key(now);
+    const currentMinutes=now.getHours()*60+now.getMinutes();
+    const [hour,minute]=t.split(":").map(Number);
+    const passed=isToday && (hour*60+minute)<=currentMinutes;
+    const unavailable=weekend||busy||passed;
+    return `<button type="button"
+      class="slot ${unavailable?"busy":""} ${selectedTime===t?"selected":""}"
+      data-time="${t}" ${unavailable?"disabled":""}>
+      ${weekend?"Fim de semana":busy?"Reservado":passed?"Encerrado":t}
+    </button>`;
   }).join("");
 
-  slotsEl.querySelectorAll(".slot:not(:disabled)").forEach(button => {
-    button.addEventListener("click", () => {
-      selectedTime = button.dataset.time;
-      msgEl.textContent = "";
+  slotsEl.querySelectorAll(".slot:not(:disabled)").forEach(button=>{
+    button.addEventListener("click",()=>{
+      selectedTime=button.dataset.time;
+      msgEl.textContent="";
       render();
     });
   });
 
-  summaryEl.innerHTML = selectedTime
-    ? `<b>${br(selectedDate)}</b><br>${selectedTime}`
+  summaryEl.innerHTML=selectedTime
+    ? `<strong>${br(selectedDate)}</strong><br>${selectedTime}`
     : "Selecione um horário.";
 
-  reserveEl.disabled = !selectedTime || isWeekend(selectedDate);
+  reserveEl.disabled=!selectedTime||isWeekend(selectedDate);
 
-  const selectedReservations = reservations.filter(
-    r => r.reservation_date === key(selectedDate)
+  const selectedReservations=reservations.filter(
+    r=>r.reservation_date===key(selectedDate)
   );
 
-  listEl.innerHTML =
-    selectedReservations.map(r => `
-      <div class="reservation">
-        <b>${r.reservation_date.split("-").reverse().join("/")}</b>
-        · ${r.start_time.slice(0,5)}
-        <br>${r.name}
-        <br><button type="button" class="cancel" data-id="${r.id}">Cancelar</button>
-      </div>
-    `).join("")
+  listEl.innerHTML=selectedReservations.map(r=>`
+    <div class="reservation">
+      <strong>${r.reservation_date.split("-").reverse().join("/")}</strong>
+      · ${r.start_time.slice(0,5)}
+      <br>${r.name}
+      <br><button type="button" class="cancel" data-id="${r.id}">Cancelar</button>
+    </div>`).join("")
     || '<span class="muted">Nenhuma reserva para este dia.</span>';
 
-  listEl.querySelectorAll(".cancel").forEach(button => {
-    button.addEventListener("click", async () => {
-      const reservation = reservations.find(r => r.id === button.dataset.id);
-      if (!reservation) return;
-
-      const email = prompt(
+  listEl.querySelectorAll(".cancel").forEach(button=>{
+    button.addEventListener("click",async()=>{
+      const reservation=reservations.find(r=>r.id===button.dataset.id);
+      if(!reservation)return;
+      const email=prompt(
         `Para cancelar a reserva de ${reservation.name}, informe o e-mail usado na reserva:`
       );
-
-      if (email === null) return;
-
-      const normalizedEmail = email.trim().toLowerCase();
-      if (!normalizedEmail) {
+      if(email===null)return;
+      const normalizedEmail=email.trim().toLowerCase();
+      if(!normalizedEmail){
         message("Informe o e-mail usado na reserva.");
         return;
       }
-
-      button.disabled = true;
-      button.textContent = "Cancelando...";
-
-      const result = await db.rpc("cancel_reservation", {
-        p_reservation_id: reservation.id,
-        p_email: normalizedEmail
+      button.disabled=true;
+      button.textContent="Cancelando...";
+      const result=await db.rpc("cancel_reservation",{
+        p_reservation_id:reservation.id,
+        p_email:normalizedEmail
       });
-
-      if (result.error) {
+      if(result.error){
         console.error(result.error);
-        message("Erro ao cancelar: " + result.error.message);
-        button.disabled = false;
-        button.textContent = "Cancelar";
+        message("Erro ao cancelar: "+result.error.message);
+        button.disabled=false;
+        button.textContent="Cancelar";
         return;
       }
-
-      if (!result.data) {
+      if(!result.data){
         message("Não foi possível cancelar. Confira o e-mail informado.");
-        button.disabled = false;
-        button.textContent = "Cancelar";
+        button.disabled=false;
+        button.textContent="Cancelar";
         return;
       }
-
-      message("Reserva cancelada.", true);
-      selectedTime = null;
+      message("Agendamento cancelado.",true);
+      selectedTime=null;
       await load();
     });
   });
 }
 
-async function load() {
-
-  const result = await db
-    .from("reservations")
+async function load(){
+  const result=await db.from("reservations")
     .select("id,reservation_date,start_time,name")
     .order("reservation_date")
     .order("start_time");
-
-  if (result.error) {
+  if(result.error){
     console.error(result.error);
-    message("Erro ao carregar reservas: " + result.error.message);
+    message("Erro ao carregar reservas: "+result.error.message);
     render();
     return;
   }
-
-  reservations = result.data || [];
+  reservations=result.data||[];
   render();
 }
 
-reserveEl.addEventListener("click", async () => {
+reserveEl.addEventListener("click",async()=>{
+  msgEl.textContent="";
+  const name=nameEl.value.trim();
+  const email=emailEl.value.trim();
 
-  msgEl.textContent = "";
-
-  const name = nameEl.value.trim();
-  const email = emailEl.value.trim();
-
-  if (!selectedTime) {
-    message("Selecione um horário.");
-    return;
-  }
-
-  if (isWeekend(selectedDate)) {
+  if(!selectedTime){message("Selecione um horário.");return;}
+  if(isWeekend(selectedDate)){
     message("Não é possível agendar aos sábados e domingos.");
     return;
   }
+  if(!name||!email){message("Informe nome e e-mail.");return;}
 
-  if (!name || !email) {
-    message("Informe nome e e-mail.");
-    return;
-  }
-
-  // Segunda proteção: impede uma reserva mesmo se o estado da tela estiver desatualizado.
-  const now = new Date();
-  const isToday = key(selectedDate) === key(now);
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  const [hour, minute] = selectedTime.split(":").map(Number);
-  const slotMinutes = hour * 60 + minute;
-
-  if (isToday && slotMinutes <= currentMinutes) {
+  const now=new Date();
+  const isToday=key(selectedDate)===key(now);
+  const currentMinutes=now.getHours()*60+now.getMinutes();
+  const [hour,minute]=selectedTime.split(":").map(Number);
+  if(isToday && (hour*60+minute)<=currentMinutes){
     message("Esse horário já passou.");
-    selectedTime = null;
+    selectedTime=null;
     render();
     return;
   }
 
-  reserveEl.disabled = true;
-  reserveEl.textContent = "Reservando...";
+  reserveEl.disabled=true;
+  reserveEl.textContent="Reservando...";
 
-  try {
+  try{
+    const result=await db.from("reservations").insert({
+      room_id:1,
+      reservation_date:key(selectedDate),
+      start_time:selectedTime+":00",
+      name,
+      email
+    });
 
-    const result = await db
-      .from("reservations")
-      .insert({
-        room_id: 1,
-        reservation_date: key(selectedDate),
-        start_time: selectedTime + ":00",
-        name: name,
-        email: email
-      });
-
-    if (result.error) {
-
+    if(result.error){
       console.error(result.error);
-
-      if (result.error.code === "23505") {
-        message("Esse horário já foi reservado.");
-      } else {
-        message("Erro ao reservar: " + result.error.message);
-      }
-
+      message(result.error.code==="23505"
+        ?"Esse horário já foi reservado."
+        :"Erro ao reservar: "+result.error.message);
       return;
     }
 
-    message("Reserva confirmada!", true);
-
-    nameEl.value = "";
-    emailEl.value = "";
-    selectedTime = null;
-
+    message("Agendamento confirmado!",true);
+    nameEl.value="";
+    emailEl.value="";
+    selectedTime=null;
     await load();
-
-  } catch (error) {
-
+  }catch(error){
     console.error(error);
-    message("Erro inesperado ao fazer a reserva.");
-
-  } finally {
-
-    reserveEl.disabled = false;
-    reserveEl.textContent = "Reservar horário";
+    message("Erro inesperado ao fazer o agendamento.");
+  }finally{
+    reserveEl.disabled=false;
+    reserveEl.textContent="Confirmar horário";
   }
 });
 
@@ -358,17 +419,10 @@ render();
 load();
 
 db.channel("reservas")
-  .on(
-    "postgres_changes",
-    {
-      event: "*",
-      schema: "public",
-      table: "reservations"
-    },
-    () => load()
-  )
+  .on("postgres_changes",{
+    event:"*",schema:"public",table:"reservations"
+  },()=>load())
   .subscribe();
 </script>
-
 </body>
 </html>
