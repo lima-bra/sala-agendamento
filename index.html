@@ -27,7 +27,7 @@ input{width:100%;padding:11px;border:1px solid #d7dce4;border-radius:9px;box-siz
 .ok{background:#e8f7ee;color:#176b3a}
 .err{background:#fff0f0;color:#a12a2a}
 .muted{color:#697386}
-.reservation{padding:10px 0;border-bottom:1px solid #edf0f3}
+.reservation{padding:10px 0;border-bottom:1px solid #edf0f3}.cancel{margin-top:7px;padding:6px 9px;font-size:.9em;color:#a12a2a;border-color:#e7caca}
 </style>
 </head>
 <body>
@@ -179,16 +179,63 @@ function render() {
         <b>${r.reservation_date.split("-").reverse().join("/")}</b>
         · ${r.start_time.slice(0,5)}
         <br>${r.name}
+        <br><button type="button" class="cancel" data-id="${r.id}">Cancelar</button>
       </div>
     `).join("")
     || '<span class="muted">Nenhuma reserva.</span>';
+
+  listEl.querySelectorAll(".cancel").forEach(button => {
+    button.addEventListener("click", async () => {
+      const reservation = reservations.find(r => r.id === button.dataset.id);
+      if (!reservation) return;
+
+      const email = prompt(
+        `Para cancelar a reserva de ${reservation.name}, informe o e-mail usado na reserva:`
+      );
+
+      if (email === null) return;
+
+      const normalizedEmail = email.trim().toLowerCase();
+      if (!normalizedEmail) {
+        message("Informe o e-mail usado na reserva.");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Cancelando...";
+
+      const result = await db.rpc("cancel_reservation", {
+        p_reservation_id: reservation.id,
+        p_email: normalizedEmail
+      });
+
+      if (result.error) {
+        console.error(result.error);
+        message("Erro ao cancelar: " + result.error.message);
+        button.disabled = false;
+        button.textContent = "Cancelar";
+        return;
+      }
+
+      if (!result.data) {
+        message("Não foi possível cancelar. Confira o e-mail informado.");
+        button.disabled = false;
+        button.textContent = "Cancelar";
+        return;
+      }
+
+      message("Reserva cancelada.", true);
+      selectedTime = null;
+      await load();
+    });
+  });
 }
 
 async function load() {
 
   const result = await db
     .from("reservations")
-    .select("reservation_date,start_time,name")
+    .select("id,reservation_date,start_time,name")
     .order("reservation_date")
     .order("start_time");
 
