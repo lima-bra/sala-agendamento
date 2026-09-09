@@ -38,15 +38,26 @@ button,input{font:inherit}
 button{cursor:pointer}
 .page{width:min(1440px,100%);margin:auto;padding:24px}
 .brandbar{
-  display:flex;align-items:center;justify-content:center;gap:26px;
-  padding:10px 18px 22px;
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  min-height:118px;padding:22px 28px 24px;margin-bottom:18px;
+  border:1px solid rgba(116,59,57,.10);
+  border-radius:22px;
+  background:rgba(255,253,249,.72);
+  box-shadow:0 10px 30px rgba(73,39,34,.06);
+  overflow:hidden;
 }
-.brand-logo{
-  width:209px;height:auto;display:block;flex:0 0 auto;
+.brandbar:before,.brandbar:after{
+  content:"";position:absolute;border:1px solid rgba(165,102,86,.16);
+  border-radius:58% 42% 52% 48%;pointer-events:none;
 }
-.brand-divider{height:64px;width:1px;background:rgba(116,59,57,.22)}
-.brand-title small{display:block;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--rose);font-weight:700}
-.brand-title h1{margin:3px 0 0;font-size:clamp(27px,3vw,43px);line-height:1;font-weight:800;letter-spacing:-.04em;color:var(--wine)}
+.brandbar:before{width:120px;height:82px;left:-48px;top:-28px;transform:rotate(-24deg)}
+.brandbar:after{width:145px;height:92px;right:-58px;bottom:-35px;transform:rotate(22deg)}
+.brand-title{text-align:center;position:relative;z-index:1}
+.brand-title small{display:block;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--rose);font-weight:800;margin-bottom:6px}
+.brand-title h1{margin:0;font-size:clamp(30px,4vw,46px);line-height:1;font-weight:800;letter-spacing:.12em;color:var(--wine)}
+.brand-title p{margin:9px 0 0;font-size:12px;letter-spacing:.03em;color:var(--muted)}
+.brand-accent{width:46px;height:2px;margin:13px auto 0;border-radius:99px;background:linear-gradient(90deg,var(--rose),var(--wine));}
 .layout{
   display:grid;
   grid-template-columns:minmax(230px,.8fr) minmax(500px,1.65fr) minmax(260px,.9fr);
@@ -171,10 +182,10 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
 }
 @media(max-width:760px){
   .page{padding:12px}
-  .brandbar{gap:13px;padding:6px 8px 16px}
-  .brand-logo{width:155px}
-  .brand-divider{height:45px}
-  .brand-title small{font-size:9px}.brand-title h1{font-size:25px}
+  .brandbar{min-height:104px;padding:18px 14px;margin-bottom:12px}
+  .brand-title small{font-size:9px}.brand-title h1{font-size:27px;letter-spacing:.09em}
+  .brand-title p{font-size:10px;margin-top:7px}
+  .brand-accent{margin-top:10px}
   .layout{grid-template-columns:1fr}
   .sidebar{min-height:auto;padding:20px}
   .welcome h2{font-size:25px}
@@ -189,11 +200,11 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
   .side-panel{grid-column:auto;min-height:auto}
 }
 @media(max-width:420px){
-  .brandbar{align-items:flex-start}
-  .brand-logo{width:132px}
-  .brand-title h1{font-size:21px}
-  .brand-divider{display:none}
-  .brandbar{display:grid;grid-template-columns:1fr;text-align:center;justify-items:center}
+  .brandbar{min-height:98px;padding:17px 10px}
+  .brand-title h1{font-size:23px;letter-spacing:.08em}
+  .brand-title p{font-size:9px}
+  .brandbar:before{width:90px;height:60px;left:-42px}
+  .brandbar:after{width:105px;height:65px;right:-46px}
   .calendar-wrap{padding:15px}
   .weekdays,.calendar-grid{gap:4px}
   .day{min-height:38px;border-radius:9px}
@@ -203,11 +214,11 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
 <body>
 <div class="page">
   <header class="brandbar">
-    <img class="brand-logo" src="logo.png" alt="MOVIMENTE — Sua saúde em movimento">
-    <div class="brand-divider"></div>
     <div class="brand-title">
       <small>Agendamento</small>
       <h1>MOVIMENTE</h1>
+      <div class="brand-accent"></div>
+      <p>Sua saúde em movimento</p>
     </div>
   </header>
 
