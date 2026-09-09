@@ -178,14 +178,6 @@ input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(167,91,115,.12)}
           <div class="brand-sub">Sua saúde em movimento</div>
         </div>
       </div>
-      <div class="account" id="account">
-        <button id="googleLogin" class="google" type="button">Entrar com Google</button>
-        <div id="userInfo" class="user-info" hidden>
-          <span id="userName"></span>
-          <span id="userEmail"></span>
-          <button id="logout" class="logout" type="button">Sair</button>
-        </div>
-      </div>
     </div>
   </header>
 
@@ -194,8 +186,6 @@ input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(167,91,115,.12)}
       <h1>Agendamento MOVIMENTE</h1>
       <p>Escolha a data e reserve seu horário de atendimento.</p>
     </section>
-
-    <div id="accessBox" class="access-box" aria-live="polite"></div>
 
     <div class="grid">
       <section class="card">
@@ -209,8 +199,11 @@ input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(167,91,115,.12)}
       <aside class="card">
         <h3>Confirmar agendamento</h3>
         <div id="summary" class="summary">Selecione um horário.</div>
-        <p id="bookingIdentity" class="muted" style="margin:12px 0 0">Entre com sua conta Google para confirmar o agendamento.</p>
-        <button id="reserve" class="primary" disabled>Confirmar horário</button>
+        <label for="name">Nome</label>
+        <input id="name" placeholder="Maria Silva">
+        <label for="email">E-mail</label>
+        <input id="email" type="email" placeholder="maria@email.com">
+        <button id="reserve" class="primary">Confirmar horário</button>
         <div id="msg" aria-live="polite"></div>
 
         <h3 style="margin-top:24px">Reservas do dia</h3>
@@ -231,287 +224,83 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const daysEl=document.getElementById("days");
 const slotsEl=document.getElementById("slots");
 const summaryEl=document.getElementById("summary");
+const nameEl=document.getElementById("name");
+const emailEl=document.getElementById("email");
 const reserveEl=document.getElementById("reserve");
 const msgEl=document.getElementById("msg");
 const listEl=document.getElementById("list");
-const googleLoginEl=document.getElementById("googleLogin");
-const userInfoEl=document.getElementById("userInfo");
-const userNameEl=document.getElementById("userName");
-const userEmailEl=document.getElementById("userEmail");
-const logoutEl=document.getElementById("logout");
-const accessBoxEl=document.getElementById("accessBox");
-const bookingIdentityEl=document.getElementById("bookingIdentity");
 
-const times=[
-  "06:59","07:59","08:59","09:59","10:59",
-  "11:59","12:59","13:59","14:59","15:59",
-  "16:59","17:59","18:59","19:59","20:59"
-];
-
+const times=["06:59","07:59","08:59","09:59","10:59","11:59","12:59","13:59","14:59","15:59","16:59","17:59","18:59","19:59","20:59"];
 const base=new Date();
 base.setHours(0,0,0,0);
-const dates=[0,1,2,3,4,5,6].map(i=>{
-  const d=new Date(base); d.setDate(d.getDate()+i); return d;
-});
-
-let selectedDate=dates[0];
-let selectedTime=null;
-let reservations=[];
-let currentUser=null;
-let authorized=false;
-
+const dates=[0,1,2,3,4,5,6].map(i=>{const d=new Date(base);d.setDate(d.getDate()+i);return d;});
+let selectedDate=dates[0],selectedTime=null,reservations=[];
 const key=d=>d.toISOString().slice(0,10);
 const br=d=>d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"});
 const weekday=d=>d.toLocaleDateString("pt-BR",{weekday:"short"}).replace(".","");
 const isWeekend=d=>[0,6].includes(d.getDay());
-
-function message(text,ok=false){
-  msgEl.className="msg "+(ok?"ok":"err");
-  msgEl.textContent=text;
-}
-
-function updateAuthUI(){
-  const logged=!!currentUser;
-  googleLoginEl.hidden=logged;
-  userInfoEl.hidden=!logged;
-
-  if(logged){
-    const meta=currentUser.user_metadata||{};
-    const name=meta.full_name||meta.name||currentUser.email||"Profissional";
-    userNameEl.textContent=name;
-    userEmailEl.textContent=currentUser.email||"";
-    bookingIdentityEl.textContent=authorized
-      ? `Agendando como ${name} · ${currentUser.email}`
-      : "Sua conta não está autorizada para realizar agendamentos.";
-  }else{
-    bookingIdentityEl.textContent="Entre com sua conta Google para confirmar o agendamento.";
-  }
-  updateReserveState();
-}
-
-function updateReserveState(){
-  reserveEl.disabled=!currentUser||!authorized||!selectedTime||isWeekend(selectedDate);
-}
-
-async function checkAuthorization(){
-  authorized=false;
-  if(!currentUser){ updateAuthUI(); return; }
-
-  const {data,error}=await db
-    .from("profissionais_autorizados")
-    .select("email,nome,ativo")
-    .eq("email",currentUser.email)
-    .eq("ativo",true)
-    .maybeSingle();
-
-  if(error){
-    console.error(error);
-    accessBoxEl.textContent="Não foi possível verificar sua autorização. Tente novamente.";
-    accessBoxEl.classList.add("show");
-    updateAuthUI();
-    return;
-  }
-
-  authorized=!!data;
-  if(authorized){
-    accessBoxEl.classList.remove("show");
-  }else{
-    accessBoxEl.textContent="Acesso restrito: esta conta Google não está autorizada para realizar agendamentos.";
-    accessBoxEl.classList.add("show");
-  }
-  updateAuthUI();
-}
+function message(text,ok=false){msgEl.className="msg "+(ok?"ok":"err");msgEl.textContent=text;}
 
 function render(){
-  daysEl.innerHTML=dates.map((d,i)=>`
-    <button type="button" class="day ${key(d)===key(selectedDate)?"active":""} ${isWeekend(d)?"weekend":""}"
-      data-day="${i}" ${isWeekend(d)?"disabled":""}>
-      ${i===0?`Hoje · ${weekday(d)}`:weekday(d)}<br>${br(d)}
-    </button>`).join("");
-
-  daysEl.querySelectorAll(".day").forEach(button=>button.addEventListener("click",()=>{
-    selectedDate=dates[Number(button.dataset.day)];
-    selectedTime=null;
-    msgEl.textContent="";
-    render();
-  }));
+  daysEl.innerHTML=dates.map((d,i)=>`<button type="button" class="day ${key(d)===key(selectedDate)?"active":""} ${isWeekend(d)?"weekend":""}" data-day="${i}" ${isWeekend(d)?"disabled":""}>${i===0?`Hoje · ${weekday(d)}`:weekday(d)}<br>${br(d)}</button>`).join("");
+  daysEl.querySelectorAll(".day").forEach(button=>button.addEventListener("click",()=>{selectedDate=dates[Number(button.dataset.day)];selectedTime=null;msgEl.textContent="";render();}));
 
   slotsEl.innerHTML=times.map(t=>{
     const weekend=isWeekend(selectedDate);
     const busy=reservations.some(r=>r.reservation_date===key(selectedDate)&&r.start_time.slice(0,5)===t);
-    const now=new Date();
-    const isToday=key(selectedDate)===key(now);
-    const currentMinutes=now.getHours()*60+now.getMinutes();
-    const [hour,minute]=t.split(":").map(Number);
-    const passed=isToday&&(hour*60+minute)<=currentMinutes;
+    const now=new Date(),isToday=key(selectedDate)===key(now),currentMinutes=now.getHours()*60+now.getMinutes();
+    const [hour,minute]=t.split(":").map(Number),passed=isToday&&(hour*60+minute)<=currentMinutes;
     const unavailable=weekend||busy||passed;
-    return `<button type="button" class="slot ${unavailable?"busy":""} ${selectedTime===t?"selected":""}"
-      data-time="${t}" ${unavailable?"disabled":""}>
-      ${weekend?"Fim de semana":busy?"Reservado":passed?"Encerrado":t}
-    </button>`;
+    return `<button type="button" class="slot ${unavailable?"busy":""} ${selectedTime===t?"selected":""}" data-time="${t}" ${unavailable?"disabled":""}>${weekend?"Fim de semana":busy?"Reservado":passed?"Encerrado":t}</button>`;
   }).join("");
-
-  slotsEl.querySelectorAll(".slot:not(:disabled)").forEach(button=>button.addEventListener("click",()=>{
-    selectedTime=button.dataset.time;
-    msgEl.textContent="";
-    render();
-  }));
-
+  slotsEl.querySelectorAll(".slot:not(:disabled)").forEach(button=>button.addEventListener("click",()=>{selectedTime=button.dataset.time;msgEl.textContent="";render();}));
   summaryEl.innerHTML=selectedTime?`<strong>${br(selectedDate)}</strong><br>${selectedTime}`:"Selecione um horário.";
-  updateReserveState();
+  reserveEl.disabled=!selectedTime||isWeekend(selectedDate);
 
   const selectedReservations=reservations.filter(r=>r.reservation_date===key(selectedDate));
-  listEl.innerHTML=selectedReservations.map(r=>{
-    const own=currentUser&&r.user_id&&r.user_id===currentUser.id;
-    return `<div class="reservation">
-      <strong>${r.reservation_date.split("-").reverse().join("/")}</strong> · ${r.start_time.slice(0,5)}
-      <br>${r.name||"Horário reservado"}
-      ${own?`<br><button type="button" class="cancel" data-id="${r.id}">Cancelar minha reserva</button>`:""}
-    </div>`;
-  }).join("")||'<span class="muted">Nenhuma reserva para este dia.</span>';
-
+  listEl.innerHTML=selectedReservations.map(r=>`<div class="reservation"><strong>${r.reservation_date.split("-").reverse().join("/")}</strong> · ${r.start_time.slice(0,5)}<br>${r.name||"Horário reservado"}<br><button type="button" class="cancel" data-id="${r.id}">Cancelar</button></div>`).join("")||'<span class="muted">Nenhuma reserva para este dia.</span>';
   listEl.querySelectorAll(".cancel").forEach(button=>button.addEventListener("click",()=>cancelReservation(button.dataset.id,button)));
 }
 
 async function cancelReservation(id,button){
-  const reservation=reservations.find(r=>r.id===id);
-  if(!reservation||!currentUser)return;
-  if(!reservation.user_id||reservation.user_id!==currentUser.id){
-    message("Você só pode cancelar uma reserva feita com sua conta.");
-    return;
-  }
-  button.disabled=true;
-  button.textContent="Cancelando...";
-
-  const result=await db.rpc("cancel_reservation",{p_reservation_id:reservation.id});
-  if(result.error){
-    console.error(result.error);
-    message("Erro ao cancelar: "+result.error.message);
-    button.disabled=false;
-    button.textContent="Cancelar minha reserva";
-    return;
-  }
-  if(!result.data){
-    message("Não foi possível cancelar esta reserva.");
-    button.disabled=false;
-    button.textContent="Cancelar minha reserva";
-    return;
-  }
-  message("Agendamento cancelado.",true);
-  selectedTime=null;
-  await load();
+  const reservation=reservations.find(r=>r.id===id);if(!reservation)return;
+  const email=prompt(`Para cancelar a reserva de ${reservation.name}, informe o e-mail usado na reserva:`);
+  if(email===null)return;
+  const normalizedEmail=email.trim().toLowerCase();
+  if(!normalizedEmail){message("Informe o e-mail usado na reserva.");return;}
+  button.disabled=true;button.textContent="Cancelando...";
+  const result=await db.rpc("cancel_reservation",{p_reservation_id:reservation.id,p_email:normalizedEmail});
+  if(result.error){console.error(result.error);message("Erro ao cancelar: "+result.error.message);button.disabled=false;button.textContent="Cancelar";return;}
+  if(!result.data){message("Não foi possível cancelar. Confira o e-mail informado.");button.disabled=false;button.textContent="Cancelar";return;}
+  message("Agendamento cancelado.",true);selectedTime=null;await load();
 }
 
 async function load(){
-  const result=await db.from("reservations")
-    .select("id,reservation_date,start_time,name,email,user_id")
-    .order("reservation_date")
-    .order("start_time");
-  if(result.error){
-    console.error(result.error);
-    message("Erro ao carregar reservas: "+result.error.message);
-    render();
-    return;
-  }
-  reservations=result.data||[];
-  render();
+  const result=await db.from("reservations").select("id,reservation_date,start_time,name,email").order("reservation_date").order("start_time");
+  if(result.error){console.error(result.error);message("Erro ao carregar reservas: "+result.error.message);render();return;}
+  reservations=result.data||[];render();
 }
-
-googleLoginEl.addEventListener("click",async()=>{
-  googleLoginEl.disabled=true;
-  googleLoginEl.textContent="Abrindo Google...";
-  const {error}=await db.auth.signInWithOAuth({
-    provider:"google",
-    options:{redirectTo:window.location.origin+window.location.pathname}
-  });
-  if(error){
-    console.error(error);
-    message("Não foi possível iniciar o login com Google: "+error.message);
-    googleLoginEl.disabled=false;
-    googleLoginEl.textContent="Entrar com Google";
-  }
-});
-
-logoutEl.addEventListener("click",async()=>{
-  await db.auth.signOut();
-  currentUser=null;
-  authorized=false;
-  selectedTime=null;
-  message("Você saiu da conta.",true);
-  accessBoxEl.classList.remove("show");
-  updateAuthUI();
-  render();
-});
 
 reserveEl.addEventListener("click",async()=>{
   msgEl.textContent="";
-  if(!currentUser){message("Entre com sua conta Google para agendar.");return;}
-  if(!authorized){message("Sua conta não está autorizada para agendar.");return;}
+  const name=nameEl.value.trim(),email=emailEl.value.trim();
   if(!selectedTime){message("Selecione um horário.");return;}
   if(isWeekend(selectedDate)){message("Não é possível agendar aos sábados e domingos.");return;}
-
-  const now=new Date();
-  const isToday=key(selectedDate)===key(now);
-  const currentMinutes=now.getHours()*60+now.getMinutes();
-  const [hour,minute]=selectedTime.split(":").map(Number);
-  if(isToday&&(hour*60+minute)<=currentMinutes){
-    message("Esse horário já passou.");
-    selectedTime=null;
-    render();
-    return;
-  }
-
-  const meta=currentUser.user_metadata||{};
-  const name=meta.full_name||meta.name||currentUser.email||"Profissional";
-  const email=currentUser.email;
-
-  reserveEl.disabled=true;
-  reserveEl.textContent="Confirmando...";
-
+  if(!name||!email){message("Informe nome e e-mail.");return;}
+  const now=new Date(),isToday=key(selectedDate)===key(now),currentMinutes=now.getHours()*60+now.getMinutes();
+  const [hour,minute]=selectedTime.split(":").map(Number),slotMinutes=hour*60+minute;
+  if(isToday&&slotMinutes<=currentMinutes){message("Esse horário já passou.");selectedTime=null;render();return;}
+  reserveEl.disabled=true;reserveEl.textContent="Confirmando...";
   try{
-    const result=await db.from("reservations").insert({
-      room_id:1,
-      reservation_date:key(selectedDate),
-      start_time:selectedTime+":00",
-      name,
-      email,
-      user_id:currentUser.id
-    });
-    if(result.error){
-      console.error(result.error);
-      message(result.error.code==="23505"?"Esse horário já foi reservado.":"Erro ao reservar: "+result.error.message);
-      return;
-    }
-    message("Agendamento confirmado!",true);
-    selectedTime=null;
-    await load();
-  }catch(error){
-    console.error(error);
-    message("Erro inesperado ao fazer o agendamento.");
-  }finally{
-    reserveEl.textContent="Confirmar horário";
-    updateReserveState();
-  }
+    const result=await db.from("reservations").insert({room_id:1,reservation_date:key(selectedDate),start_time:selectedTime+":00",name,email});
+    if(result.error){console.error(result.error);message(result.error.code==="23505"?"Esse horário já foi reservado.":"Erro ao reservar: "+result.error.message);return;}
+    message("Agendamento confirmado!",true);nameEl.value="";emailEl.value="";selectedTime=null;await load();
+  }catch(error){console.error(error);message("Erro inesperado ao fazer o agendamento.");}
+  finally{reserveEl.textContent="Confirmar horário";reserveEl.disabled=!selectedTime||isWeekend(selectedDate);}
 });
 
-db.auth.onAuthStateChange(async(_event,session)=>{
-  currentUser=session?.user||null;
-  await checkAuthorization();
-  render();
-  load();
-});
-
-(async function init(){
-  const {data}=await db.auth.getSession();
-  currentUser=data.session?.user||null;
-  await checkAuthorization();
-  render();
-  load();
-})();
-
-db.channel("reservas")
-  .on("postgres_changes",{event:"*",schema:"public",table:"reservations"},()=>load())
-  .subscribe();
+render();load();
+db.channel("reservas").on("postgres_changes",{event:"*",schema:"public",table:"reservations"},()=>load()).subscribe();
 </script>
 </body>
 </html>
