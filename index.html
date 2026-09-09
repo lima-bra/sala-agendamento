@@ -151,8 +151,10 @@ button{cursor:pointer}
 .confirm-hint{font-size:11px;line-height:1.45;color:var(--muted);margin-bottom:9px}
 .confirm-area.ready .confirm-hint{color:var(--wine);font-weight:650}
 .confirm-area:not(.ready) .confirm{display:none}
-.msg{margin-top:11px;border-radius:12px;padding:11px 12px;font-size:12px;display:none}
+.msg{margin-top:16px;border-radius:15px;padding:14px 17px;font-size:13px;font-weight:800;display:none;width:100%;text-align:center}
 .msg.show{display:block}.msg.ok{background:#edf7f1;color:var(--ok)}.msg.err{background:#fff0ef;color:var(--danger)}
+.confirm-area.success .confirm{display:none}
+.confirm-area.success .msg{display:block}
 
 .side-panel{padding:0;min-height:650px}
 .panel-body{padding:25px}
@@ -281,7 +283,6 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
           <span id="selectedDateLabel">Selecione uma data</span>
         </div>
         <div class="slots" id="slots"></div>
-        <div class="msg" id="msg"></div>
       </div>
     </section>
 
@@ -366,8 +367,13 @@ const isWeekend = d => [0,6].includes(d.getDay());
 function message(text, ok=false){
   msgEl.textContent=text;
   msgEl.className="msg show "+(ok?"ok":"err");
+  confirmAreaEl.classList.toggle("success",ok);
 }
-function clearMessage(){msgEl.textContent="";msgEl.className="msg";}
+function clearMessage(){
+  msgEl.textContent="";
+  msgEl.className="msg";
+  confirmAreaEl.classList.remove("success");
+}
 
 function renderCalendar(){
   monthTitleEl.textContent = monthName(viewMonth).replace(/^./, c => c.toUpperCase());
