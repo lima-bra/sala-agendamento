@@ -166,6 +166,15 @@ input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(167,91,115,.12)}
   .google{padding:9px 10px;font-size:.82rem}
 }
 </style>
+
+<style>
+.form-group{margin-top:14px}
+.form-group label{display:block;margin:0 0 6px;font-size:.88rem;font-weight:700}
+.form-group input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);outline:none}
+.form-group input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(167,91,115,.12)}
+#reserve:disabled{opacity:.5;cursor:not-allowed}
+</style>
+
 </head>
 <body>
 <div class="app">
@@ -184,29 +193,36 @@ input:focus{border-color:var(--rose);box-shadow:0 0 0 3px rgba(167,91,115,.12)}
   <main class="main">
     <section class="hero">
       <h1>Agendamento MOVIMENTE</h1>
-      <p>Escolha a data e reserve seu horário de atendimento.</p>
+      <p>Reserve a sala para o horário da sua terapia com o paciente.</p>
     </section>
 
     <div class="grid">
       <section class="card">
-        <h2>Agende seu horário</h2>
-        <p class="muted">Selecione uma data e depois um horário disponível.</p>
+        <h2>Reserve a sala</h2>
+        <p class="muted">Escolha a data e o horário em que você utilizará a sala.</p>
         <div id="days" class="days"></div>
-        <h3>Horários disponíveis</h3>
+        <h3>Horários disponíveis para uso da sala</h3>
         <div id="slots" class="slots"></div>
       </section>
 
       <aside class="card">
-        <h3>Confirmar agendamento</h3>
-        <div id="summary" class="summary">Selecione um horário.</div>
-        <label for="name">Nome</label>
-        <input id="name" placeholder="Maria Silva">
-        <label for="email">E-mail</label>
-        <input id="email" type="email" placeholder="maria@email.com">
-        <button id="reserve" class="primary">Confirmar horário</button>
+        <h3>Confirmar reserva da sala</h3>
+        <div id="summary" class="summary">Selecione um horário para começar.</div>
+
+        <div class="form-group">
+          <label for="name">Nome do profissional</label>
+          <input id="name" autocomplete="name" placeholder="Digite seu nome">
+        </div>
+
+        <div class="form-group">
+          <label for="email">E-mail do profissional</label>
+          <input id="email" type="email" autocomplete="email" placeholder="Digite seu e-mail">
+        </div>
+
+        <button id="reserve" class="primary" type="button" disabled>Confirmar reserva da sala</button>
         <div id="msg" aria-live="polite"></div>
 
-        <h3 style="margin-top:24px">Reservas do dia</h3>
+        <h3 style="margin-top:24px">Reservas da sala no dia</h3>
         <div id="list"></div>
       </aside>
     </div>
@@ -255,7 +271,7 @@ function render(){
   }).join("");
   slotsEl.querySelectorAll(".slot:not(:disabled)").forEach(button=>button.addEventListener("click",()=>{selectedTime=button.dataset.time;msgEl.textContent="";render();}));
   summaryEl.innerHTML=selectedTime?`<strong>${br(selectedDate)}</strong><br>${selectedTime}`:"Selecione um horário.";
-  reserveEl.disabled=!selectedTime||isWeekend(selectedDate);
+  reserveEl.disabled=!selectedTime||isWeekend(selectedDate)||!nameEl.value.trim()||!emailEl.value.trim();
 
   const selectedReservations=reservations.filter(r=>r.reservation_date===key(selectedDate));
   listEl.innerHTML=selectedReservations.map(r=>`<div class="reservation"><strong>${r.reservation_date.split("-").reverse().join("/")}</strong> · ${r.start_time.slice(0,5)}<br>${r.name||"Horário reservado"}<br><button type="button" class="cancel" data-id="${r.id}">Cancelar</button></div>`).join("")||'<span class="muted">Nenhuma reserva para este dia.</span>';
@@ -281,6 +297,9 @@ async function load(){
   reservations=result.data||[];render();
 }
 
+nameEl.addEventListener("input",updateReserveState);
+emailEl.addEventListener("input",updateReserveState);
+
 reserveEl.addEventListener("click",async()=>{
   msgEl.textContent="";
   const name=nameEl.value.trim(),email=emailEl.value.trim();
@@ -296,7 +315,7 @@ reserveEl.addEventListener("click",async()=>{
     if(result.error){console.error(result.error);message(result.error.code==="23505"?"Esse horário já foi reservado.":"Erro ao reservar: "+result.error.message);return;}
     message("Agendamento confirmado!",true);nameEl.value="";emailEl.value="";selectedTime=null;await load();
   }catch(error){console.error(error);message("Erro inesperado ao fazer o agendamento.");}
-  finally{reserveEl.textContent="Confirmar horário";reserveEl.disabled=!selectedTime||isWeekend(selectedDate);}
+  finally{reserveEl.textContent="Confirmar horário";reserveEl.disabled=!selectedTime||isWeekend(selectedDate)||!nameEl.value.trim()||!emailEl.value.trim();}
 });
 
 render();load();
