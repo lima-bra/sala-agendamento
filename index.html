@@ -519,9 +519,13 @@ reserveEl.addEventListener("click", async ()=>{
 
   reserveEl.disabled=true; reserveEl.textContent="Reservando...";
   try{
-    const result=await db.from("reservations").insert({
-      room_id:1,reservation_date:key(selectedDate),start_time:selectedTime+":00",name,email
-    });
+    const result=await db.rpc("create_reservation",{
+  p_room_id:1,
+  p_reservation_date:key(selectedDate),
+  p_start_time:selectedTime+":00",
+  p_name:name,
+  p_email:email
+  });
     if(result.error){
       if(result.error.code==="23505") message("Esse horário já foi reservado.");
       else message("Erro ao reservar: "+result.error.message);
