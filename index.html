@@ -532,8 +532,27 @@ reserveEl.addEventListener("click", async ()=>{
       return;
     }
     message("Reserva confirmada!",true);
-    nameEl.value=""; emailEl.value=""; selectedTime=null;
-    await load();
+
+const emailResult = await db.functions.invoke("send-reservation-email", {
+  body: {
+    name: name,
+    email: email,
+    date: key(selectedDate),
+    time: selectedTime
+  }
+});
+
+if (emailResult.error) {
+  console.error("Erro ao enviar e-mail:", emailResult.error);
+} else {
+  console.log("E-mail enviado:", emailResult.data);
+}
+
+nameEl.value="";
+emailEl.value="";
+selectedTime=null;
+
+await load();
   }catch(error){
     console.error(error); message("Erro inesperado ao fazer a reserva.");
   }finally{
