@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#8b4a40">
 <title>Agendamento MOVIMENTE</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 :root{
   --wine:#743b39;
@@ -24,11 +22,8 @@
   --shadow:0 18px 50px rgba(73,39,34,.12);
   --radius:24px;
 }
-
 *{box-sizing:border-box}
-
 html{scroll-behavior:smooth}
-
 body{
   margin:0;
   font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
@@ -39,103 +34,35 @@ body{
     linear-gradient(135deg,#f7eee8 0%,#fcf8f4 48%,#f5ebe5 100%);
   min-height:100vh;
 }
-
 button,input{font:inherit}
 button{cursor:pointer}
-
-.page{
-  width:min(1440px,100%);
-  margin:auto;
-  padding:24px;
-}
-
+.page{width:min(1440px,100%);margin:auto;padding:24px}
 .brandbar{
   position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:118px;
-  padding:22px 28px 24px;
-  margin-bottom:18px;
+  display:flex;align-items:center;justify-content:center;
+  min-height:118px;padding:22px 28px 24px;margin-bottom:18px;
   border:1px solid rgba(116,59,57,.10);
   border-radius:22px;
   background:rgba(255,253,249,.72);
   box-shadow:0 10px 30px rgba(73,39,34,.06);
   overflow:hidden;
 }
-
-.brandbar:before,
-.brandbar:after{
-  content:"";
-  position:absolute;
-  border:1px solid rgba(165,102,86,.16);
-  border-radius:58% 42% 52% 48%;
-  pointer-events:none;
+.brandbar:before,.brandbar:after{
+  content:"";position:absolute;border:1px solid rgba(165,102,86,.16);
+  border-radius:58% 42% 52% 48%;pointer-events:none;
 }
-
-.brandbar:before{
-  width:120px;
-  height:82px;
-  left:-48px;
-  top:-28px;
-  transform:rotate(-24deg)
-}
-
-.brandbar:after{
-  width:145px;
-  height:92px;
-  right:-58px;
-  bottom:-35px;
-  transform:rotate(22deg)
-}
-
-.brand-title{
-  text-align:center;
-  position:relative;
-  z-index:1
-}
-
-.brand-title small{
-  display:block;
-  font-size:11px;
-  letter-spacing:.24em;
-  text-transform:uppercase;
-  color:var(--rose);
-  font-weight:800;
-  margin-bottom:6px
-}
-
-.brand-title h1{
-  margin:0;
-  font-size:clamp(30px,4vw,46px);
-  line-height:1;
-  font-weight:800;
-  letter-spacing:.12em;
-  color:var(--wine)
-}
-
-.brand-title p{
-  margin:9px 0 0;
-  font-size:12px;
-  letter-spacing:.03em;
-  color:var(--muted)
-}
-
-.brand-accent{
-  width:46px;
-  height:2px;
-  margin:13px auto 0;
-  border-radius:99px;
-  background:linear-gradient(90deg,var(--rose),var(--wine));
-}
-
+.brandbar:before{width:120px;height:82px;left:-48px;top:-28px;transform:rotate(-24deg)}
+.brandbar:after{width:145px;height:92px;right:-58px;bottom:-35px;transform:rotate(22deg)}
+.brand-title{text-align:center;position:relative;z-index:1}
+.brand-title small{display:block;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--rose);font-weight:800;margin-bottom:6px}
+.brand-title h1{margin:0;font-size:clamp(30px,4vw,46px);line-height:1;font-weight:800;letter-spacing:.12em;color:var(--wine)}
+.brand-title p{margin:9px 0 0;font-size:12px;letter-spacing:.03em;color:var(--muted)}
+.brand-accent{width:46px;height:2px;margin:13px auto 0;border-radius:99px;background:linear-gradient(90deg,var(--rose),var(--wine));}
 .layout{
   display:grid;
   grid-template-columns:minmax(230px,.8fr) minmax(500px,1.65fr) minmax(260px,.9fr);
-  gap:18px;
-  align-items:stretch;
+  gap:18px;align-items:stretch;
 }
-
 .card{
   background:rgba(255,253,249,.94);
   border:1px solid rgba(116,59,57,.10);
@@ -143,7 +70,6 @@ button{cursor:pointer}
   box-shadow:var(--shadow);
   overflow:hidden;
 }
-
 .sidebar{
   min-height:650px;
   padding:26px;
@@ -153,758 +79,147 @@ button{cursor:pointer}
     linear-gradient(145deg,#7d403b 0%,#9d5c4d 55%,#78403c 100%);
   position:relative;
 }
-
 .sidebar:after{
-  content:"";
-  position:absolute;
-  width:190px;
-  height:190px;
-  border:1px solid rgba(255,255,255,.10);
-  border-radius:50%;
-  right:-95px;
-  bottom:-80px;
-  box-shadow:
-    0 0 0 35px rgba(255,255,255,.035),
-    0 0 0 70px rgba(255,255,255,.025);
+  content:"";position:absolute;width:190px;height:190px;border:1px solid rgba(255,255,255,.10);
+  border-radius:50%;right:-95px;bottom:-80px;box-shadow:0 0 0 35px rgba(255,255,255,.035),0 0 0 70px rgba(255,255,255,.025);
 }
-
-.welcome{
-  position:relative;
-  z-index:1;
-  margin:16px 0 25px
-}
-
-.welcome h2{
-  margin:0 0 7px;
-  font-size:30px;
-  letter-spacing:-.04em
-}
-
-.welcome p{
-  margin:0;
-  color:rgba(255,255,255,.78);
-  line-height:1.5
-}
-
-.menu{
-  position:relative;
-  z-index:1;
-  display:grid;
-  gap:11px
-}
-
+.welcome{position:relative;z-index:1;margin:16px 0 25px}
+.welcome h2{margin:0 0 7px;font-size:30px;letter-spacing:-.04em}
+.welcome p{margin:0;color:rgba(255,255,255,.78);line-height:1.5}
+.menu{position:relative;z-index:1;display:grid;gap:11px}
 .menu button{
-  width:100%;
-  text-align:left;
-  border:1px solid rgba(255,255,255,.16);
-  background:rgba(255,255,255,.10);
-  color:#fff;
-  border-radius:17px;
-  padding:14px;
-  display:grid;
-  grid-template-columns:42px 1fr 20px;
-  gap:11px;
-  align-items:center;
+  width:100%;text-align:left;border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.10);color:#fff;border-radius:17px;padding:14px;
+  display:grid;grid-template-columns:42px 1fr 20px;gap:11px;align-items:center;
   transition:.18s ease;
 }
-
-.menu button:hover{
-  background:rgba(255,255,255,.17);
-  transform:translateY(-1px)
-}
-
+.menu button:hover{background:rgba(255,255,255,.17);transform:translateY(-1px)}
 .icon{
-  width:42px;
-  height:42px;
-  border-radius:13px;
-  background:rgba(255,255,255,.14);
-  display:grid;
-  place-items:center;
-  font-size:20px
+  width:42px;height:42px;border-radius:13px;background:rgba(255,255,255,.14);
+  display:grid;place-items:center;font-size:20px
 }
+.menu strong{display:block;font-size:14px}.menu span{display:block;margin-top:3px;font-size:11px;line-height:1.35;color:rgba(255,255,255,.68)}
+.arrow{font-size:20px;color:rgba(255,255,255,.6)}
+.side-note{position:absolute;z-index:1;left:26px;right:26px;bottom:25px;border-top:1px solid rgba(255,255,255,.16);padding-top:15px;color:rgba(255,255,255,.63);font-size:11px;line-height:1.5}
 
-.menu strong{
-  display:block;
-  font-size:14px
-}
-
-.menu span{
-  display:block;
-  margin-top:3px;
-  font-size:11px;
-  line-height:1.35;
-  color:rgba(255,255,255,.68)
-}
-
-.arrow{
-  font-size:20px;
-  color:rgba(255,255,255,.6)
-}
-
-.side-note{
-  position:absolute;
-  z-index:1;
-  left:26px;
-  right:26px;
-  bottom:25px;
-  border-top:1px solid rgba(255,255,255,.16);
-  padding-top:15px;
-  color:rgba(255,255,255,.63);
-  font-size:11px;
-  line-height:1.5
-}
-
-.main{
-  padding:0;
-  min-height:650px
-}
-
+.main{padding:0;min-height:650px}
 .section-head{
-  padding:22px 25px 18px;
-  border-bottom:1px solid var(--line);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  gap:12px
+  padding:22px 25px 18px;border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;gap:12px
 }
-
-.section-head .heading{
-  display:flex;
-  align-items:center;
-  gap:13px
-}
-
-.heading-icon{
-  width:44px;
-  height:44px;
-  border-radius:14px;
-  background:var(--soft);
-  display:grid;
-  place-items:center;
-  font-size:21px
-}
-
-.section-head h2{
-  margin:0;
-  font-size:22px;
-  letter-spacing:-.025em
-}
-
-.section-head p{
-  margin:3px 0 0;
-  font-size:12px;
-  color:var(--muted)
-}
-
-.status{
-  font-size:11px;
-  color:var(--ok);
-  background:#edf7f1;
-  padding:8px 10px;
-  border-radius:999px;
-  white-space:nowrap
-}
-
-.calendar-wrap{
-  padding:23px 25px 25px
-}
-
-.calendar-top{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:15px
-}
-
-.calendar-top strong{
-  font-size:17px
-}
-
-.nav-btn{
-  width:35px;
-  height:35px;
-  border-radius:11px;
-  border:1px solid var(--line);
-  background:#fff;
-  color:var(--wine)
-}
-
-.nav-btn:hover{
-  background:var(--soft)
-}
-
-.calendar-nav{
-  display:flex;
-  gap:7px
-}
-
-.weekdays,
-.calendar-grid{
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-  gap:7px
-}
-
-.weekdays{
-  margin-bottom:7px
-}
-
-.weekdays span{
-  text-align:center;
-  font-size:10px;
-  font-weight:800;
-  color:#a08f89;
-  text-transform:uppercase
-}
-
+.section-head .heading{display:flex;align-items:center;gap:13px}
+.heading-icon{width:44px;height:44px;border-radius:14px;background:var(--soft);display:grid;place-items:center;font-size:21px}
+.section-head h2{margin:0;font-size:22px;letter-spacing:-.025em}
+.section-head p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.status{font-size:11px;color:var(--ok);background:#edf7f1;padding:8px 10px;border-radius:999px;white-space:nowrap}
+.calendar-wrap{padding:23px 25px 25px}
+.calendar-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.calendar-top strong{font-size:17px}
+.nav-btn{width:35px;height:35px;border-radius:11px;border:1px solid var(--line);background:#fff;color:var(--wine)}
+.nav-btn:hover{background:var(--soft)}
+.calendar-nav{display:flex;gap:7px}
+.weekdays,.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.weekdays{margin-bottom:7px}
+.weekdays span{text-align:center;font-size:10px;font-weight:800;color:#a08f89;text-transform:uppercase}
 .day{
-  min-height:45px;
-  border:1px solid transparent;
-  background:#fff;
-  border-radius:12px;
-  color:var(--ink);
-  font-weight:650;
-  transition:.15s
+  min-height:45px;border:1px solid transparent;background:#fff;border-radius:12px;color:var(--ink);
+  font-weight:650;transition:.15s
 }
-
-.day:hover:not(:disabled){
-  border-color:#d9b8ab;
-  background:#fffaf7
-}
-
-.day.selected{
-  background:var(--wine);
-  color:#fff;
-  box-shadow:0 7px 16px rgba(116,59,57,.18)
-}
-
-.day.disabled{
-  color:#c9bbb5;
-  background:#f7f3f0;
-  cursor:not-allowed
-}
-
-.day.today{
-  border-color:#b87562
-}
-
-.slots-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:end;
-  margin:25px 0 12px
-}
-
-.slots-head h3{
-  margin:0;
-  font-size:16px
-}
-
-.slots-head span{
-  font-size:11px;
-  color:var(--muted)
-}
-
-.slots{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:8px
-}
-
+.day:hover:not(:disabled){border-color:#d9b8ab;background:#fffaf7}
+.day.selected{background:var(--wine);color:#fff;box-shadow:0 7px 16px rgba(116,59,57,.18)}
+.day.disabled{color:#c9bbb5;background:#f7f3f0;cursor:not-allowed}
+.day.today{border-color:#b87562}
+.slots-head{display:flex;justify-content:space-between;align-items:end;margin:25px 0 12px}
+.slots-head h3{margin:0;font-size:16px}
+.slots-head span{font-size:11px;color:var(--muted)}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .slot{
-  border:1px solid var(--line);
-  background:#fff8f4;
-  color:var(--wine);
-  border-radius:12px;
-  padding:11px 8px;
-  font-weight:700;
-  font-size:13px
+  border:1px solid var(--line);background:#fff8f4;color:var(--wine);
+  border-radius:12px;padding:11px 8px;font-weight:700;font-size:13px
 }
-
-.slot:hover:not(:disabled){
-  border-color:#bb806e;
-  background:#f7e8e1
-}
-
-.slot.selected{
-  background:var(--wine);
-  color:#fff;
-  border-color:var(--wine)
-}
-
-.slot.busy{
-  background:#f1eeec;
-  color:#aaa19d;
-  text-decoration:line-through;
-  cursor:not-allowed
-}
-
-.slot.busy.no-line{
-  text-decoration:none
-}
-
+.slot:hover:not(:disabled){border-color:#bb806e;background:#f7e8e1}
+.slot.selected{background:var(--wine);color:#fff;border-color:var(--wine)}
+.slot.busy{background:#f1eeec;color:#aaa19d;text-decoration:line-through;cursor:not-allowed}
+.slot.busy.no-line{text-decoration:none}
 .confirm{
-  width:100%;
-  margin-top:16px;
-  border:0;
-  border-radius:15px;
-  padding:14px 17px;
-  color:#fff;
-  background:linear-gradient(135deg,#713936,#965548);
-  font-weight:800;
+  width:100%;margin-top:16px;border:0;border-radius:15px;padding:14px 17px;
+  color:#fff;background:linear-gradient(135deg,#713936,#965548);font-weight:800;
   box-shadow:0 10px 22px rgba(116,59,57,.17)
 }
+.confirm:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.confirm-area{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+.confirm-hint{font-size:11px;line-height:1.45;color:var(--muted);margin-bottom:9px}
+.confirm-area.ready .confirm-hint{color:var(--wine);font-weight:650}
+.confirm-area:not(.ready) .confirm{display:none}
+.msg{margin-top:16px;border-radius:15px;padding:14px 17px;font-size:13px;font-weight:800;display:none;width:100%;text-align:center}
+.msg.show{display:block}.msg.ok{background:#edf7f1;color:var(--ok)}.msg.err{background:#fff0ef;color:var(--danger)}
+.confirm-area.success .confirm{display:none}
+.confirm-area.success .msg{display:block}
 
-.confirm:disabled{
-  opacity:.45;
-  cursor:not-allowed;
-  box-shadow:none
-}
-
-.confirm-area{
-  margin-top:18px;
-  padding-top:16px;
-  border-top:1px solid var(--line)
-}
-
-.confirm-hint{
-  font-size:11px;
-  line-height:1.45;
-  color:var(--muted);
-  margin-bottom:9px
-}
-
-.confirm-area.ready .confirm-hint{
-  color:var(--wine);
-  font-weight:650
-}
-
-.confirm-area:not(.ready) .confirm{
-  display:none
-}
-
-.msg{
-  margin-top:16px;
-  border-radius:15px;
-  padding:14px 17px;
-  font-size:13px;
-  font-weight:800;
-  display:none;
-  width:100%;
-  text-align:center
-}
-
-.msg.show{
-  display:block
-}
-
-.msg.ok{
-  background:#edf7f1;
-  color:var(--ok)
-}
-
-.msg.err{
-  background:#fff0ef;
-  color:var(--danger)
-}
-
-.confirm-area.success .confirm{
-  display:none
-}
-
-.confirm-area.success .msg{
-  display:block
-}
-
-.side-panel{
-  padding:0;
-  min-height:650px
-}
-
-.panel-body{
-  padding:25px
-}
-
-.panel-body h2{
-  margin:0;
-  font-size:21px;
-  letter-spacing:-.03em
-}
-
-.panel-body>p{
-  font-size:12px;
-  line-height:1.55;
-  color:var(--muted);
-  margin:7px 0 20px
-}
-
+.side-panel{padding:0;min-height:650px}
+.panel-body{padding:25px}
+.panel-body h2{margin:0;font-size:21px;letter-spacing:-.03em}
+.panel-body>p{font-size:12px;line-height:1.55;color:var(--muted);margin:7px 0 20px}
 .summary{
   background:linear-gradient(135deg,#f6e9e2,#fbf5f0);
-  border:1px solid var(--line);
-  border-radius:16px;
-  padding:15px;
-  margin-bottom:18px
+  border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:18px
 }
-
-.summary .label{
-  font-size:10px;
-  text-transform:uppercase;
-  letter-spacing:.11em;
-  color:var(--rose);
-  font-weight:800
-}
-
-.summary strong{
-  display:block;
-  margin-top:4px;
-  font-size:16px;
-  color:var(--wine)
-}
-
-label{
-  display:block;
-  font-size:12px;
-  font-weight:750;
-  margin:12px 0 6px
-}
-
+.summary .label{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:var(--rose);font-weight:800}
+.summary strong{display:block;margin-top:4px;font-size:16px;color:var(--wine)}
+label{display:block;font-size:12px;font-weight:750;margin:12px 0 6px}
 input{
-  width:100%;
-  padding:12px 13px;
-  border-radius:12px;
-  border:1px solid var(--line);
-  background:#fff;
-  color:var(--ink);
-  outline:none
+  width:100%;padding:12px 13px;border-radius:12px;border:1px solid var(--line);
+  background:#fff;color:var(--ink);outline:none
 }
-
-input:focus{
-  border-color:#b67866;
-  box-shadow:0 0 0 3px rgba(182,120,102,.12)
-}
-
-input:disabled{
-  background:#f7f3f0;
-  color:#6e5e5a;
-  cursor:not-allowed
-}
-
-.auth-box{
-  border:1px solid var(--line);
-  background:#fffaf7;
-  border-radius:16px;
-  padding:15px;
-  margin-bottom:18px
-}
-
-.auth-title{
-  font-size:14px;
-  font-weight:800;
-  color:var(--wine);
-  margin-bottom:5px
-}
-
-.auth-text{
-  font-size:11px;
-  line-height:1.45;
-  color:var(--muted);
-  margin-bottom:12px
-}
-
-.auth-row{
-  display:flex;
-  gap:8px
-}
-
-.auth-row input{
-  flex:1;
-  min-width:0
-}
-
-.auth-button{
-  border:1px solid var(--wine);
-  background:#fff;
-  color:var(--wine);
-  border-radius:11px;
-  padding:11px 12px;
-  font-size:12px;
-  font-weight:750;
-  white-space:nowrap
-}
-
-.auth-button:hover{
-  background:var(--soft)
-}
-
-.auth-button:disabled{
-  opacity:.5;
-  cursor:not-allowed
-}
-
-.otp-area{
-  margin-top:11px;
-  display:none
-}
-
-.otp-area.show{
-  display:block
-}
-
-.otp-input{
-  letter-spacing:.45em;
-  font-size:19px;
-  font-weight:800;
-  text-align:center
-}
-
-.validate-button{
-  width:100%;
-  margin-top:8px;
-  border:0;
-  border-radius:11px;
-  padding:11px;
-  background:var(--wine);
-  color:#fff;
-  font-weight:800
-}
-
-.validate-button:disabled{
-  opacity:.5;
-  cursor:not-allowed
-}
-
-.authenticated{
-  display:none
-}
-
-.authenticated.show{
-  display:block
-}
-
-.logged-name{
-  font-size:16px;
-  font-weight:800;
-  color:var(--wine)
-}
-
-.logged-email{
-  font-size:11px;
-  color:var(--muted);
-  margin-top:3px
-}
-
-.logout{
-  margin-top:11px;
-  border:1px solid var(--line);
-  background:#fff;
-  color:var(--danger);
-  border-radius:10px;
-  padding:8px 11px;
-  font-size:11px;
-  font-weight:750
-}
-
-.reserve-list{
-  margin-top:27px;
-  padding-top:20px;
-  border-top:1px solid var(--line)
-}
-
-.reserve-list h3{
-  margin:0 0 11px;
-  font-size:14px
-}
-
-.reservation{
-  padding:10px 0;
-  border-bottom:1px solid #f0e7e2;
-  font-size:11px;
-  line-height:1.45
-}
-
+input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
+.reserve-list{margin-top:27px;padding-top:20px;border-top:1px solid var(--line)}
+.reserve-list h3{margin:0 0 11px;font-size:14px}
+.reservation{padding:10px 0;border-bottom:1px solid #f0e7e2;font-size:11px;line-height:1.45}
 .cancel{
-  margin-top:7px;
-  border:1px solid #e6c4be;
-  background:#fff5f3;
-  color:var(--danger);
-  border-radius:9px;
-  padding:6px 9px;
-  font-size:11px
+  margin-top:7px;border:1px solid #e6c4be;background:#fff5f3;color:var(--danger);
+  border-radius:9px;padding:6px 9px;font-size:11px
 }
-
-.cancel:hover{
-  background:#fdeae7
-}
-
-.cancel:disabled{
-  opacity:.5;
-  cursor:not-allowed
-}
-
-.empty{
-  color:var(--muted);
-  font-size:11px
-}
-
+.cancel:hover{background:#fdeae7}
+.empty{color:var(--muted);font-size:11px}
 @media(max-width:1100px){
-  .layout{
-    grid-template-columns:230px 1fr
-  }
-
-  .side-panel{
-    grid-column:1/-1;
-    min-height:auto
-  }
-
-  .side-panel .panel-body{
-    max-width:700px;
-    margin:auto
-  }
+  .layout{grid-template-columns:230px 1fr}
+  .side-panel{grid-column:1/-1;min-height:auto}
+  .side-panel .panel-body{max-width:700px;margin:auto}
 }
-
 @media(max-width:760px){
-  .page{
-    padding:12px
-  }
-
-  .brandbar{
-    min-height:104px;
-    padding:18px 14px;
-    margin-bottom:12px
-  }
-
-  .brand-title small{
-    font-size:9px
-  }
-
-  .brand-title h1{
-    font-size:27px;
-    letter-spacing:.09em
-  }
-
-  .brand-title p{
-    font-size:10px;
-    margin-top:7px
-  }
-
-  .brand-accent{
-    margin-top:10px
-  }
-
-  .layout{
-    grid-template-columns:1fr
-  }
-
-  .sidebar{
-    min-height:auto;
-    padding:20px
-  }
-
-  .welcome h2{
-    font-size:25px
-  }
-
-  .menu{
-    grid-template-columns:1fr
-  }
-
-  .side-note{
-    position:static;
-    margin-top:20px;
-    padding-top:14px
-  }
-
-  .main{
-    min-height:auto
-  }
-
-  .calendar-wrap{
-    padding:18px
-  }
-
-  .section-head{
-    padding:18px
-  }
-
-  .status{
-    display:none
-  }
-
-  .day{
-    min-height:40px;
-    font-size:12px
-  }
-
-  .slots{
-    grid-template-columns:repeat(2,1fr)
-  }
-
-  .side-panel{
-    grid-column:auto;
-    min-height:auto
-  }
-
-  .confirm-area{
-    margin-top:18px
-  }
-
-  .auth-row{
-    flex-direction:column
-  }
-
-  .auth-button{
-    width:100%
-  }
+  .page{padding:12px}
+  .brandbar{min-height:104px;padding:18px 14px;margin-bottom:12px}
+  .brand-title small{font-size:9px}.brand-title h1{font-size:27px;letter-spacing:.09em}
+  .brand-title p{font-size:10px;margin-top:7px}
+  .brand-accent{margin-top:10px}
+  .layout{grid-template-columns:1fr}
+  .sidebar{min-height:auto;padding:20px}
+  .welcome h2{font-size:25px}
+  .menu{grid-template-columns:1fr}
+  .side-note{position:static;margin-top:20px;padding-top:14px}
+  .main{min-height:auto}
+  .calendar-wrap{padding:18px}
+  .section-head{padding:18px}
+  .status{display:none}
+  .day{min-height:40px;font-size:12px}
+  .slots{grid-template-columns:repeat(2,1fr)}
+  .side-panel{grid-column:auto;min-height:auto}
+  .confirm-area{margin-top:18px}
 }
-
 @media(max-width:420px){
-  .brandbar{
-    min-height:98px;
-    padding:17px 10px
-  }
-
-  .brand-title h1{
-    font-size:23px;
-    letter-spacing:.08em
-  }
-
-  .brand-title p{
-    font-size:9px
-  }
-
-  .brandbar:before{
-    width:90px;
-    height:60px;
-    left:-42px
-  }
-
-  .brandbar:after{
-    width:105px;
-    height:65px;
-    right:-46px
-  }
-
-  .calendar-wrap{
-    padding:15px
-  }
-
-  .weekdays,
-  .calendar-grid{
-    gap:4px
-  }
-
-  .day{
-    min-height:38px;
-    border-radius:9px
-  }
+  .brandbar{min-height:98px;padding:17px 10px}
+  .brand-title h1{font-size:23px;letter-spacing:.08em}
+  .brand-title p{font-size:9px}
+  .brandbar:before{width:90px;height:60px;left:-42px}
+  .brandbar:after{width:105px;height:65px;right:-46px}
+  .calendar-wrap{padding:15px}
+  .weekdays,.calendar-grid{gap:4px}
+  .day{min-height:38px;border-radius:9px}
 }
 </style>
 </head>
-
 <body>
-
 <div class="page">
-
   <header class="brandbar">
     <div class="brand-title">
       <small>Agendamento de sala</small>
@@ -915,1928 +230,373 @@ input:disabled{
   </header>
 
   <main class="layout">
-
     <aside class="card sidebar">
-
       <div class="welcome">
         <h2>Área do profissional</h2>
         <p>Agende a sala para sua terapia.</p>
       </div>
-
       <nav class="menu" aria-label="Menu">
-
         <button type="button" data-scroll="agenda">
           <div class="icon">📅</div>
-          <div>
-            <strong>Agendar horário</strong>
-            <span>Escolha o melhor dia e horário para utilizar a sala.</span>
-          </div>
+          <div><strong>Agendar horário</strong><span>Escolha o melhor dia e horário para utilizar a sala.</span></div>
           <div class="arrow">›</div>
         </button>
-
         <button type="button" data-scroll="cancel">
           <div class="icon">×</div>
-          <div>
-            <strong>Cancelar agendamento</strong>
-            <span>Cancele uma reserva vinculada à sua conta.</span>
-          </div>
+          <div><strong>Cancelar agendamento</strong><span>Cancele uma reserva usando o e-mail informado.</span></div>
           <div class="arrow">›</div>
         </button>
-
         <button type="button" data-scroll="info">
           <div class="icon">i</div>
-          <div>
-            <strong>Informações</strong>
-            <span>Consulte horários, regras e disponibilidade da sala.</span>
-          </div>
+          <div><strong>Informações</strong><span>Consulte horários, regras e disponibilidade da sala.</span></div>
           <div class="arrow">›</div>
         </button>
-
       </nav>
-
-      <div class="side-note" id="info">
-        Uma única sala está disponível para os atendimentos.
-        Sábados e domingos não possuem horários disponíveis.
-      </div>
-
+      <div class="side-note" id="info">Uma única sala está disponível para os atendimentos. Sábados e domingos não possuem horários disponíveis.</div>
     </aside>
 
-
     <section class="card main" id="agenda">
-
       <div class="section-head">
-
         <div class="heading">
           <div class="heading-icon">📅</div>
-
           <div>
             <h2>Agendar sala</h2>
             <p>Selecione a data e escolha um horário disponível para seu atendimento.</p>
           </div>
         </div>
-
         <div class="status">● Agenda online</div>
-
       </div>
 
-
       <div class="calendar-wrap">
-
         <div class="calendar-top">
-          <button
-            class="nav-btn"
-            id="prevMonth"
-            type="button"
-            aria-label="Mês anterior">
-            ‹
-          </button>
-
+          <button class="nav-btn" id="prevMonth" type="button" aria-label="Mês anterior">‹</button>
           <strong id="monthTitle"></strong>
-
-          <div class="calendar-nav">
-            <button
-              class="nav-btn"
-              id="nextMonth"
-              type="button"
-              aria-label="Próximo mês">
-              ›
-            </button>
-          </div>
+          <div class="calendar-nav"><button class="nav-btn" id="nextMonth" type="button" aria-label="Próximo mês">›</button></div>
         </div>
-
-
         <div class="weekdays">
-          <span>Dom</span>
-          <span>Seg</span>
-          <span>Ter</span>
-          <span>Qua</span>
-          <span>Qui</span>
-          <span>Sex</span>
-          <span>Sáb</span>
+          <span>Dom</span><span>Seg</span><span>Ter</span><span>Qua</span><span>Qui</span><span>Sex</span><span>Sáb</span>
         </div>
-
         <div class="calendar-grid" id="calendar"></div>
-
 
         <div class="slots-head">
           <h3>Horários disponíveis</h3>
           <span id="selectedDateLabel">Selecione uma data</span>
         </div>
-
         <div class="slots" id="slots"></div>
-
       </div>
-
     </section>
 
-
     <aside class="card side-panel" id="cancel">
-
       <div class="section-head">
-
         <div class="heading">
-
           <div class="heading-icon">📅</div>
-
           <div>
             <h2>Dados da Reserva</h2>
           </div>
-
         </div>
-
       </div>
-
-
       <div class="panel-body">
-
         <h2>Confirmação de reserva</h2>
-
-        <p>
-          Primeiro identifique-se com seu e-mail.
-          Depois escolha o horário e confirme o agendamento.
-        </p>
-
-
+        <p>Após escolher o horário, informe seu nome e o e-mail utilizado na reserva.</p>
         <div class="summary" id="summary">
-
           <div class="label">Horário da sala</div>
-
-          <strong>
-            Selecione uma data e horário.
-          </strong>
-
+          <strong>Selecione uma data e horário.</strong>
         </div>
 
+        <label for="name">Profissional</label>
+        <input id="name" autocomplete="name" placeholder="Nome do profissional">
 
-        <!-- AUTENTICAÇÃO -->
+        <label for="email">E-mail</label>
+        <input id="email" type="email" autocomplete="email" placeholder="seu@email.com">
 
-        <div class="auth-box" id="authBox">
-
-          <div class="auth-title">
-            Identificação do profissional
-          </div>
-
-          <div class="auth-text">
-            Informe o e-mail cadastrado para receber um código de acesso.
-          </div>
-
-
-          <div id="loginForm">
-
-            <label for="email">
-              E-mail do profissional
-            </label>
-
-            <div class="auth-row">
-
-              <input
-                id="email"
-                type="email"
-                autocomplete="email"
-                placeholder="seu@email.com">
-
-              <button
-                id="sendCode"
-                class="auth-button"
-                type="button">
-                Enviar código
-              </button>
-
-            </div>
-
-
-            <div
-              class="otp-area"
-              id="otpArea">
-
-              <label for="otp">
-                Código de acesso
-              </label>
-
-              <input
-                id="otp"
-                class="otp-input"
-                inputmode="numeric"
-                autocomplete="one-time-code"
-                maxlength="6"
-                placeholder="000000">
-
-              <button
-                id="verifyCode"
-                class="validate-button"
-                type="button">
-                Validar código
-              </button>
-
-            </div>
-
-          </div>
-
-
-          <div
-            class="authenticated"
-            id="authenticated">
-
-            <div class="logged-name" id="loggedName"></div>
-
-            <div class="logged-email" id="loggedEmail"></div>
-
-            <button
-              id="logout"
-              class="logout"
-              type="button">
-              Sair / trocar profissional
-            </button>
-
-          </div>
-
+        <div class="confirm-area" id="confirmArea" aria-live="polite">
+          <div class="confirm-hint" id="confirmHint">Selecione um horário e preencha seus dados para confirmar.</div>
+          <button class="confirm" id="reserve" type="button" disabled>Confirmar agendamento →</button>
+          <div class="msg" id="msg"></div>
         </div>
-
-
-        <!-- CONFIRMAÇÃO -->
-
-        <div
-          class="confirm-area"
-          id="confirmArea"
-          aria-live="polite">
-
-          <div
-            class="confirm-hint"
-            id="confirmHint">
-            Primeiro, identifique-se com seu e-mail.
-          </div>
-
-          <button
-            class="confirm"
-            id="reserve"
-            type="button"
-            disabled>
-            Confirmar agendamento →
-          </button>
-
-          <div
-            class="msg"
-            id="msg">
-          </div>
-
-        </div>
-
-
-        <!-- RESERVAS -->
 
         <div class="reserve-list">
-
           <h3>Reservas da sala no dia</h3>
-
-          <div id="list">
-            <span class="empty">
-              Nenhuma reserva para esta data.
-            </span>
-          </div>
-
+          <div id="list"><span class="empty">Nenhuma reserva para esta data.</span></div>
         </div>
-
       </div>
-
     </aside>
-
   </main>
-
 </div>
 
-
 <script>
+const SUPABASE_URL = "https://yazwurspiuviohxyyjgt.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_X_vbBWPoBwTnjdzsKx47HA_CUeHwtxA";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const SUPABASE_URL =
-  "https://yazwurspiuviohxyyjgt.supabase.co";
-
-const SUPABASE_ANON_KEY =
-  "sb_publishable_X_vbBWPoBwTnjdzsKx47HA_CUeHwtxA";
-
-const db =
-  window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-
-/* ELEMENTOS */
-
-const calendarEl =
-  document.getElementById("calendar");
-
-const slotsEl =
-  document.getElementById("slots");
-
-const monthTitleEl =
-  document.getElementById("monthTitle");
-
-const selectedDateLabelEl =
-  document.getElementById("selectedDateLabel");
-
-const summaryEl =
-  document.getElementById("summary");
-
-const emailEl =
-  document.getElementById("email");
-
-const otpEl =
-  document.getElementById("otp");
-
-const sendCodeEl =
-  document.getElementById("sendCode");
-
-const verifyCodeEl =
-  document.getElementById("verifyCode");
-
-const otpAreaEl =
-  document.getElementById("otpArea");
-
-const loginFormEl =
-  document.getElementById("loginForm");
-
-const authenticatedEl =
-  document.getElementById("authenticated");
-
-const loggedNameEl =
-  document.getElementById("loggedName");
-
-const loggedEmailEl =
-  document.getElementById("loggedEmail");
-
-const logoutEl =
-  document.getElementById("logout");
-
-const reserveEl =
-  document.getElementById("reserve");
-
-const confirmAreaEl =
-  document.getElementById("confirmArea");
-
-const confirmHintEl =
-  document.getElementById("confirmHint");
-
-const msgEl =
-  document.getElementById("msg");
-
-const listEl =
-  document.getElementById("list");
-
-
-/* HORÁRIOS */
+const calendarEl = document.getElementById("calendar");
+const slotsEl = document.getElementById("slots");
+const monthTitleEl = document.getElementById("monthTitle");
+const selectedDateLabelEl = document.getElementById("selectedDateLabel");
+const summaryEl = document.getElementById("summary");
+const nameEl = document.getElementById("name");
+const emailEl = document.getElementById("email");
+const reserveEl = document.getElementById("reserve");
+const confirmAreaEl = document.getElementById("confirmArea");
+const confirmHintEl = document.getElementById("confirmHint");
+const msgEl = document.getElementById("msg");
+const listEl = document.getElementById("list");
 
 const times = [
-  "06:59",
-  "07:59",
-  "08:59",
-  "09:59",
-  "10:59",
-  "11:59",
-  "12:59",
-  "13:59",
-  "14:59",
-  "15:59",
-  "16:59",
-  "17:59",
-  "18:59",
-  "19:59",
-  "20:59"
+  "06:59","07:59","08:59","09:59","10:59",
+  "11:59","12:59","13:59","14:59","15:59",
+  "16:59","17:59","18:59","19:59","20:59"
 ];
 
-
-/* CALENDÁRIO */
-
 const today = new Date();
-
 today.setHours(0,0,0,0);
-
-let viewMonth =
-  new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    1
-  );
-
+let viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 let selectedDate = null;
-
 let selectedTime = null;
-
 let reservations = [];
 
-
-/* AUTENTICAÇÃO */
-
-let currentUser = null;
-
-let professionalName = null;
-
-
-/* FUNÇÕES AUXILIARES */
-
 const key = d => {
-
-  const y =
-    d.getFullYear();
-
-  const m =
-    String(d.getMonth()+1)
-      .padStart(2,"0");
-
-  const day =
-    String(d.getDate())
-      .padStart(2,"0");
-
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), day=String(d.getDate()).padStart(2,"0");
   return `${y}-${m}-${day}`;
 };
+const formatDate = d => d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit",year:"numeric"});
+const monthName = d => d.toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+const isWeekend = d => [0,6].includes(d.getDay());
 
-
-const formatDate = d =>
-  d.toLocaleDateString(
-    "pt-BR",
-    {
-      day:"2-digit",
-      month:"2-digit",
-      year:"numeric"
-    }
-  );
-
-
-const monthName = d =>
-  d.toLocaleDateString(
-    "pt-BR",
-    {
-      month:"long",
-      year:"numeric"
-    }
-  );
-
-
-const isWeekend = d =>
-  [0,6].includes(d.getDay());
-
-
-function message(text,ok=false){
-
-  msgEl.textContent = text;
-
-  msgEl.className =
-    "msg show " +
-    (ok ? "ok" : "err");
-
-  confirmAreaEl.classList
-    .toggle("success",ok);
+function message(text, ok=false){
+  msgEl.textContent=text;
+  msgEl.className="msg show "+(ok?"ok":"err");
+  confirmAreaEl.classList.toggle("success",ok);
 }
-
-
 function clearMessage(){
-
-  msgEl.textContent = "";
-
-  msgEl.className = "msg";
-
-  confirmAreaEl.classList
-    .remove("success");
+  msgEl.textContent="";
+  msgEl.className="msg";
+  confirmAreaEl.classList.remove("success");
 }
-
-
-function escapeHtml(value){
-
-  return String(value)
-    .replace(
-      /[&<>"']/g,
-      c => ({
-        '&':'&amp;',
-        '<':'&lt;',
-        '>':'&gt;',
-        '"':'&quot;',
-        "'":'&#039;'
-      }[c])
-    );
-}
-
-
-/* CALENDÁRIO */
 
 function renderCalendar(){
-
-  monthTitleEl.textContent =
-    monthName(viewMonth)
-      .replace(/^./,c => c.toUpperCase());
-
-
-  const first =
-    new Date(
-      viewMonth.getFullYear(),
-      viewMonth.getMonth(),
-      1
-    );
-
-
-  const daysInMonth =
-    new Date(
-      viewMonth.getFullYear(),
-      viewMonth.getMonth()+1,
-      0
-    ).getDate();
-
-
-  const cells = [];
-
-
-  for(
-    let i=0;
-    i<first.getDay();
-    i++
-  ){
-
-    cells.push(`<div></div>`);
-
+  monthTitleEl.textContent = monthName(viewMonth).replace(/^./, c => c.toUpperCase());
+  const first = new Date(viewMonth.getFullYear(),viewMonth.getMonth(),1);
+  const daysInMonth = new Date(viewMonth.getFullYear(),viewMonth.getMonth()+1,0).getDate();
+  const cells=[];
+  for(let i=0;i<first.getDay();i++) cells.push(`<div></div>`);
+  for(let day=1;day<=daysInMonth;day++){
+    const d=new Date(viewMonth.getFullYear(),viewMonth.getMonth(),day);
+    const isPast=d<today;
+    const disabled=isPast || isWeekend(d);
+    const selected=selectedDate && key(d)===key(selectedDate);
+    const todayClass=key(d)===key(today)?"today":"";
+    cells.push(`<button type="button" class="day ${selected?"selected ":""}${disabled?"disabled ":""}${todayClass}"
+      data-date="${key(d)}" ${disabled?"disabled":""}>${day}</button>`);
   }
-
-
-  for(
-    let day=1;
-    day<=daysInMonth;
-    day++
-  ){
-
-    const d =
-      new Date(
-        viewMonth.getFullYear(),
-        viewMonth.getMonth(),
-        day
-      );
-
-
-    const isPast =
-      d < today;
-
-
-    const disabled =
-      isPast || isWeekend(d);
-
-
-    const selected =
-      selectedDate &&
-      key(d) === key(selectedDate);
-
-
-    const todayClass =
-      key(d) === key(today)
-        ? "today"
-        : "";
-
-
-    cells.push(`
-
-      <button
-        type="button"
-        class="day ${
-          selected
-            ? "selected "
-            : ""
-        }${
-          disabled
-            ? "disabled "
-            : ""
-        }${todayClass}"
-        data-date="${key(d)}"
-        ${disabled ? "disabled" : ""}
-      >
-        ${day}
-      </button>
-
-    `);
-
-  }
-
-
-  calendarEl.innerHTML =
-    cells.join("");
-
-
-  calendarEl
-    .querySelectorAll(".day:not(:disabled)")
-    .forEach(btn => {
-
-      btn.addEventListener(
-        "click",
-        () => {
-
-          const [
-            y,
-            m,
-            d
-          ] =
-            btn.dataset.date
-              .split("-")
-              .map(Number);
-
-
-          selectedDate =
-            new Date(
-              y,
-              m-1,
-              d
-            );
-
-
-          selectedTime = null;
-
-          clearMessage();
-
-          render();
-
-        }
-      );
-
+  calendarEl.innerHTML=cells.join("");
+  calendarEl.querySelectorAll(".day:not(:disabled)").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const [y,m,d]=btn.dataset.date.split("-").map(Number);
+      selectedDate=new Date(y,m-1,d);
+      selectedTime=null;
+      clearMessage();
+      render();
     });
-
+  });
 }
-
-
-/* HORÁRIOS */
 
 function renderSlots(){
-
   if(!selectedDate){
-
-    selectedDateLabelEl.textContent =
-      "Selecione uma data";
-
-    slotsEl.innerHTML =
-      `<span class="empty">
-        Escolha uma data no calendário.
-      </span>`;
-
-    updateConfirmState();
-
-    renderSummary();
-
+    selectedDateLabelEl.textContent="Selecione uma data";
+    slotsEl.innerHTML=`<span class="empty">Escolha uma data no calendário.</span>`;
+    reserveEl.disabled=true;
+    summaryEl.innerHTML=`<div class="label">Horário da sala</div><strong>Selecione uma data e horário.</strong>`;
     return;
-
   }
 
-
-  selectedDateLabelEl.textContent =
-    formatDate(selectedDate);
-
-
-  const now =
-    new Date();
-
-
-  const isToday =
-    key(selectedDate) === key(now);
-
-
-  slotsEl.innerHTML =
-    times.map(t => {
-
-      const busy =
-        reservations.some(
-          r =>
-            r.reservation_date ===
-              key(selectedDate) &&
-            r.start_time.slice(0,5) === t
-        );
-
-
-      const [h,m] =
-        t.split(":").map(Number);
-
-
-      const passed =
-        isToday &&
-        h*60+m <=
-          now.getHours()*60 +
-          now.getMinutes();
-
-
-      const unavailable =
-        busy || passed;
-
-
-      return `
-
-        <button
-          type="button"
-          class="slot ${
-            unavailable
-              ? "busy "
-              : ""
-          }${
-            selectedTime === t
-              ? "selected"
-              : ""
-          }"
-          data-time="${t}"
-          ${unavailable ? "disabled" : ""}
-        >
-
-          ${
-            busy
-              ? "Reservado"
-              : passed
-                ? "Encerrado"
-                : t
-          }
-
-        </button>
-
-      `;
-
-    }).join("");
-
-
-  slotsEl
-    .querySelectorAll(".slot:not(:disabled)")
-    .forEach(btn => {
-
-      btn.addEventListener(
-        "click",
-        () => {
-
-          selectedTime =
-            btn.dataset.time;
-
-          clearMessage();
-
-          renderSlots();
-
-          renderSummary();
-
-        }
-      );
-
-    });
-
-
-  updateConfirmState();
-
-  renderSummary();
-
-}
-
-
-/* RESUMO */
-
-function renderSummary(){
-
-  if(
-    selectedDate &&
-    selectedTime
-  ){
-
-    summaryEl.innerHTML = `
-      <div class="label">
-        Horário da sala
-      </div>
-
-      <strong>
-        ${formatDate(selectedDate)}
-        ·
-        ${selectedTime}
-      </strong>
-    `;
-
-  }
-
-  else if(selectedDate){
-
-    summaryEl.innerHTML = `
-      <div class="label">
-        Data selecionada
-      </div>
-
-      <strong>
-        ${formatDate(selectedDate)}
-      </strong>
-    `;
-
-  }
-
-  else{
-
-    summaryEl.innerHTML = `
-      <div class="label">
-        Horário da sala
-      </div>
-
-      <strong>
-        Selecione uma data e horário.
-      </strong>
-    `;
-
-  }
-
-
-  const selectedReservations =
-    selectedDate
-      ? reservations.filter(
-          r =>
-            r.reservation_date ===
-            key(selectedDate)
-        )
-      : [];
-
-
-  listEl.innerHTML =
-    selectedReservations
-      .map(r => `
-
-        <div class="reservation">
-
-          <b>
-            ${r.start_time.slice(0,5)}
-          </b>
-
-          ·
-          ${escapeHtml(r.name)}
-
-          <br>
-
-          <button
-            type="button"
-            class="cancel"
-            data-id="${r.id}"
-          >
-            Cancelar
-          </button>
-
-        </div>
-
-      `)
-      .join("")
-    ||
-      `<span class="empty">
-        Nenhuma reserva para esta data.
-      </span>`;
-
-
-  listEl
-    .querySelectorAll(".cancel")
-    .forEach(btn => {
-
-      btn.addEventListener(
-        "click",
-        () =>
-          cancelReservation(
-            btn.dataset.id,
-            btn
-          )
-      );
-
-    });
-
-}
-
-
-/* ESTADO DO BOTÃO */
-
-function updateConfirmState(){
-
-  const hasDateTime =
-    Boolean(
-      selectedDate &&
-      selectedTime
-    );
-
-
-  const authenticated =
-    Boolean(currentUser);
-
-
-  const ready =
-    hasDateTime &&
-    authenticated;
-
-
-  confirmAreaEl.classList
-    .toggle(
-      "ready",
-      ready
-    );
-
-
-  reserveEl.disabled =
-    !ready;
-
-
-  if(!authenticated){
-
-    confirmHintEl.textContent =
-      "Primeiro, identifique-se com seu e-mail.";
-
-    return;
-
-  }
-
-
-  if(!hasDateTime){
-
-    confirmHintEl.textContent =
-      "Primeiro, selecione a data e o horário da sala.";
-
-    return;
-
-  }
-
-
-  confirmHintEl.textContent =
-    "Tudo pronto. Confirme o agendamento da sala.";
-
-}
-
-
-/* AUTENTICAÇÃO — ATUALIZAÇÃO DA TELA */
-
-function updateAuthUI(){
-
-  if(currentUser){
-
-    loginFormEl.style.display =
-      "none";
-
-    authenticatedEl.classList
-      .add("show");
-
-
-    loggedNameEl.textContent =
-      professionalName ||
-      "Profissional autenticado";
-
-
-    loggedEmailEl.textContent =
-      currentUser.email || "";
-
-
-  }else{
-
-    loginFormEl.style.display =
-      "block";
-
-    authenticatedEl.classList
-      .remove("show");
-
-
-    loggedNameEl.textContent = "";
-
-    loggedEmailEl.textContent = "";
-
-  }
-
-
-  updateConfirmState();
-
-}
-
-
-/* BUSCA NOME DO PROFISSIONAL */
-
-async function loadProfessional(){
-
-  const result =
-    await db.rpc(
-      "get_current_professional"
-    );
-
-
-  if(result.error){
-
-    console.error(
-      result.error
-    );
-
-    throw result.error;
-
-  }
-
-
-  const row =
-    Array.isArray(result.data)
-      ? result.data[0]
-      : result.data;
-
-
-  if(!row){
-
-    throw new Error(
-      "E-mail não autorizado para acessar o agendamento."
-    );
-
-  }
-
-
-  professionalName =
-    row.professional_name;
-
-}
-
-
-/* ENVIAR CÓDIGO */
-
-sendCodeEl.addEventListener(
-  "click",
-  async () => {
-
-    clearMessage();
-
-
-    const email =
-      emailEl.value
-        .trim()
-        .toLowerCase();
-
-
-    if(!email){
-
-      message(
-        "Informe seu e-mail."
-      );
-
-      return;
-
-    }
-
-
-    if(!emailEl.checkValidity()){
-
-      message(
-        "Informe um e-mail válido."
-      );
-
-      return;
-
-    }
-
-
-    sendCodeEl.disabled =
-      true;
-
-    sendCodeEl.textContent =
-      "Enviando...";
-
-
-    try{
-
-      const result =
-        await db.auth.signInWithOtp({
-
-          email:email,
-
-          options:{
-            shouldCreateUser:false
-          }
-
-        });
-
-
-      if(result.error){
-
-        throw result.error;
-
-      }
-
-
-      otpAreaEl.classList
-        .add("show");
-
-
-      otpEl.value = "";
-
-      otpEl.focus();
-
-
-      message(
-        "Código enviado. Confira seu e-mail.",
-        true
-      );
-
-
-    }catch(error){
-
-      console.error(error);
-
-      message(
-        "Não foi possível enviar o código: " +
-        error.message
-      );
-
-    }finally{
-
-      sendCodeEl.disabled =
-        false;
-
-      sendCodeEl.textContent =
-        "Enviar código";
-
-    }
-
-  }
-);
-
-
-/* VALIDAR CÓDIGO */
-
-verifyCodeEl.addEventListener(
-  "click",
-  async () => {
-
-    clearMessage();
-
-
-    const email =
-      emailEl.value
-        .trim()
-        .toLowerCase();
-
-
-    const token =
-      otpEl.value
-        .replace(/\D/g,"")
-        .trim();
-
-
-    if(!email){
-
-      message(
-        "Informe seu e-mail."
-      );
-
-      return;
-
-    }
-
-
-    if(token.length !== 6){
-
-      message(
-        "Digite o código de 6 dígitos recebido por e-mail."
-      );
-
-      return;
-
-    }
-
-
-    verifyCodeEl.disabled =
-      true;
-
-    verifyCodeEl.textContent =
-      "Validando...";
-
-
-    try{
-
-      const result =
-        await db.auth.verifyOtp({
-
-          email:email,
-
-          token:token,
-
-          type:"email"
-
-        });
-
-
-      if(result.error){
-
-        throw result.error;
-
-      }
-
-
-      currentUser =
-        result.data.user;
-
-
-      await loadProfessional();
-
-
-      updateAuthUI();
-
-
-      message(
-        "Acesso confirmado. Você já pode agendar.",
-        true
-      );
-
-
-    }catch(error){
-
-      console.error(error);
-
-
-      currentUser = null;
-
-      professionalName = null;
-
-
-      await db.auth.signOut();
-
-
-      updateAuthUI();
-
-
-      message(
-        error.message &&
-        error.message.includes(
-          "não autorizado"
-        )
-          ? "Este e-mail não está autorizado para agendamento."
-          : "Código inválido ou expirado. Solicite um novo código."
-      );
-
-    }finally{
-
-      verifyCodeEl.disabled =
-        false;
-
-      verifyCodeEl.textContent =
-        "Validar código";
-
-    }
-
-  }
-);
-
-
-/* LOGOUT */
-
-logoutEl.addEventListener(
-  "click",
-  async () => {
-
-    await db.auth.signOut();
-
-    currentUser = null;
-
-    professionalName = null;
-
-    emailEl.value = "";
-
-    otpEl.value = "";
-
-    otpAreaEl.classList
-      .remove("show");
-
-
-    clearMessage();
-
-    updateAuthUI();
-
-    message(
-      "Você saiu da conta.",
-      true
-    );
-
-  }
-);
-
-
-/* RESERVA */
-
-reserveEl.addEventListener(
-  "click",
-  async () => {
-
-    clearMessage();
-
-
-    if(!currentUser){
-
-      message(
-        "Identifique-se antes de confirmar o agendamento."
-      );
-
-      return;
-
-    }
-
-
-    if(
-      !selectedDate ||
-      !selectedTime
-    ){
-
-      message(
-        "Selecione a data e o horário."
-      );
-
-      return;
-
-    }
-
-
-    if(isWeekend(selectedDate)){
-
-      message(
-        "Não é possível agendar aos sábados e domingos."
-      );
-
-      return;
-
-    }
-
-
-    const now =
-      new Date();
-
-
-    if(
-      key(selectedDate) ===
-      key(now)
-    ){
-
-      const [h,m] =
-        selectedTime
-          .split(":")
-          .map(Number);
-
-
-      if(
-        h*60+m <=
-        now.getHours()*60 +
-        now.getMinutes()
-      ){
-
-        message(
-          "Esse horário já passou."
-        );
-
-        selectedTime = null;
-
-        renderSlots();
-
-        return;
-
-      }
-
-    }
-
-
-    reserveEl.disabled =
-      true;
-
-    reserveEl.textContent =
-      "Reservando...";
-
-
-    try{
-
-      const result =
-        await db.rpc(
-          "create_reservation",
-          {
-            p_room_id:1,
-
-            p_reservation_date:
-              key(selectedDate),
-
-            p_start_time:
-              selectedTime + ":00"
-          }
-        );
-
-
-      if(result.error){
-
-        console.error(
-          result.error
-        );
-
-
-        if(
-          result.error.code ===
-          "23505"
-        ){
-
-          message(
-            "Esse horário já foi reservado."
-          );
-
-        }else{
-
-          message(
-            "Erro ao reservar: " +
-            result.error.message
-          );
-
-        }
-
-        return;
-
-      }
-
-
-      const reservation =
-        Array.isArray(result.data)
-          ? result.data[0]
-          : result.data;
-
-
-      message(
-        "Reserva confirmada!",
-        true
-      );
-
-
-      /*
-       * Envia o e-mail de confirmação.
-       * A identidade usada aqui vem da sessão autenticada.
-       */
-
-      const emailResult =
-        await db.functions.invoke(
-          "send-reservation-email",
-          {
-            body:{
-              name:
-                professionalName,
-
-              email:
-                currentUser.email,
-
-              date:
-                key(selectedDate),
-
-              time:
-                selectedTime
-            }
-          }
-        );
-
-
-      if(emailResult.error){
-
-        console.error(
-          "Erro ao enviar e-mail:",
-          emailResult.error
-        );
-
-      }else{
-
-        console.log(
-          "E-mail enviado:",
-          emailResult.data
-        );
-
-      }
-
-
-      selectedTime = null;
-
-      await load();
-
-
-    }catch(error){
-
-      console.error(error);
-
-      message(
-        "Erro inesperado ao fazer a reserva."
-      );
-
-    }finally{
-
-      reserveEl.textContent =
-        "Confirmar agendamento →";
-
-      updateConfirmState();
-
-    }
-
-  }
-);
-
-
-/* CANCELAMENTO */
-
-async function cancelReservation(
-  id,
-  btn
-){
-
-  const reservation =
-    reservations.find(
-      r => r.id === id
-    );
-
-
-  if(!reservation){
-
-    return;
-
-  }
-
-
-  if(!currentUser){
-
-    message(
-      "Entre com sua conta para cancelar uma reserva."
-    );
-
-    return;
-
-  }
-
-
-  const confirmed =
-    window.confirm(
-      `Deseja cancelar a reserva das ${reservation.start_time.slice(0,5)}?`
-    );
-
-
-  if(!confirmed){
-
-    return;
-
-  }
-
-
-  btn.disabled =
-    true;
-
-  btn.textContent =
-    "Cancelando...";
-
-
-  try{
-
-    const result =
-      await db.rpc(
-        "cancel_reservation",
-        {
-          p_reservation_id:
-            reservation.id
-        }
-      );
-
-
-    if(result.error){
-
-      console.error(
-        result.error
-      );
-
-      message(
-        "Erro ao cancelar: " +
-        result.error.message
-      );
-
-      btn.disabled =
-        false;
-
-      btn.textContent =
-        "Cancelar";
-
-      return;
-
-    }
-
-
-    if(!result.data){
-
-      /*
-       * Isso acontece quando a reserva não
-       * pertence ao usuário autenticado.
-       */
-
-      message(
-        "Essa reserva não pertence ao profissional autenticado."
-      );
-
-      btn.disabled =
-        false;
-
-      btn.textContent =
-        "Cancelar";
-
-      return;
-
-    }
-
-
-    message(
-      "Reserva cancelada.",
-      true
-    );
-
-
-    selectedTime = null;
-
-    await load();
-
-
-  }catch(error){
-
-    console.error(error);
-
-    message(
-      "Erro inesperado ao cancelar a reserva."
-    );
-
-    btn.disabled =
-      false;
-
-    btn.textContent =
-      "Cancelar";
-
-  }
-
-}
-
-
-/* CARREGAR RESERVAS */
-
-async function load(){
-
-  const result =
-    await db
-      .from("reservations")
-      .select(
-        "id,reservation_date,start_time,name"
-      )
-      .order(
-        "reservation_date"
-      )
-      .order(
-        "start_time"
-      );
-
-
-  if(result.error){
-
-    console.error(
-      result.error
-    );
-
-    message(
-      "Erro ao carregar reservas: " +
-      result.error.message
-    );
-
-    render();
-
-    return;
-
-  }
-
-
-  reservations =
-    result.data || [];
-
-
-  render();
-
-}
-
-
-/* RENDER */
-
-function render(){
-
-  renderCalendar();
-
-  renderSlots();
-
-}
-
-
-/* NAVEGAÇÃO DO CALENDÁRIO */
-
-document
-  .getElementById("prevMonth")
-  .addEventListener(
-    "click",
-    () => {
-
-      const previous =
-        new Date(
-          viewMonth.getFullYear(),
-          viewMonth.getMonth()-1,
-          1
-        );
-
-
-      if(
-        previous <
-        new Date(
-          today.getFullYear(),
-          today.getMonth(),
-          1
-        )
-      ){
-
-        return;
-
-      }
-
-
-      viewMonth =
-        previous;
-
-      selectedDate =
-        null;
-
-      selectedTime =
-        null;
-
+  selectedDateLabelEl.textContent=formatDate(selectedDate);
+  const now=new Date();
+  const isToday=key(selectedDate)===key(now);
+  slotsEl.innerHTML=times.map(t=>{
+    const busy=reservations.some(r=>r.reservation_date===key(selectedDate)&&r.start_time.slice(0,5)===t);
+    const [h,m]=t.split(":").map(Number);
+    const passed=isToday && h*60+m <= now.getHours()*60+now.getMinutes();
+    const unavailable=busy||passed;
+    return `<button type="button" class="slot ${unavailable?"busy ":""}${selectedTime===t?"selected":""}"
+      data-time="${t}" ${unavailable?"disabled":""}>
+      ${busy?"Reservado":passed?"Encerrado":t}
+    </button>`;
+  }).join("");
+
+  slotsEl.querySelectorAll(".slot:not(:disabled)").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      selectedTime=btn.dataset.time;
       clearMessage();
-
-      render();
-
-    }
-  );
-
-
-document
-  .getElementById("nextMonth")
-  .addEventListener(
-    "click",
-    () => {
-
-      viewMonth =
-        new Date(
-          viewMonth.getFullYear(),
-          viewMonth.getMonth()+1,
-          1
-        );
-
-
-      selectedDate =
-        null;
-
-      selectedTime =
-        null;
-
-      clearMessage();
-
-      render();
-
-    }
-  );
-
-
-/* MENU */
-
-document
-  .querySelectorAll("[data-scroll]")
-  .forEach(btn => {
-
-    btn.addEventListener(
-      "click",
-      () => {
-
-        document
-          .getElementById(
-            btn.dataset.scroll
-          )
-          ?.scrollIntoView({
-            behavior:"smooth",
-            block:"start"
-          });
-
-      }
-    );
-
+      renderSlots();
+      renderSummary();
+    });
   });
 
-
-/* INPUT DO OTP */
-
-otpEl.addEventListener(
-  "input",
-  () => {
-
-    otpEl.value =
-      otpEl.value
-        .replace(/\D/g,"")
-        .slice(0,6);
-
-  }
-);
-
-
-/* SUPABASE AUTH STATE */
-
-db.auth.onAuthStateChange(
-  async (_event,session) => {
-
-    if(!session){
-
-      currentUser = null;
-
-      professionalName = null;
-
-      updateAuthUI();
-
-      return;
-
-    }
-
-
-    /*
-     * Evita depender apenas do estado local.
-     * A sessão do Supabase é a fonte da autenticação.
-     */
-
-    currentUser =
-      session.user;
-
-
-    try{
-
-      await loadProfessional();
-
-      updateAuthUI();
-
-    }catch(error){
-
-      console.error(error);
-
-      await db.auth.signOut();
-
-      currentUser = null;
-
-      professionalName = null;
-
-      updateAuthUI();
-
-    }
-
-  }
-);
-
-
-/* INICIALIZAÇÃO */
-
-async function init(){
-
-  render();
-
-  await load();
-
-
-  const sessionResult =
-    await db.auth.getSession();
-
-
-  if(
-    sessionResult.data &&
-    sessionResult.data.session
-  ){
-
-    currentUser =
-      sessionResult.data.session.user;
-
-
-    try{
-
-      await loadProfessional();
-
-    }catch(error){
-
-      console.error(error);
-
-      await db.auth.signOut();
-
-      currentUser = null;
-
-      professionalName = null;
-
-    }
-
-  }
-
-
-  updateAuthUI();
-
+  updateConfirmState();
+  renderSummary();
 }
 
+function updateConfirmState(){
+  const hasDateTime=Boolean(selectedDate && selectedTime);
+  const hasProfessional=nameEl.value.trim().length>0;
+  const hasEmail=emailEl.value.trim().length>0 && emailEl.checkValidity();
+  const ready=hasDateTime && hasProfessional && hasEmail;
 
-init();
+  confirmAreaEl.classList.toggle("ready",ready);
+  reserveEl.disabled=!ready;
 
+  if(!hasDateTime){
+    confirmHintEl.textContent="Primeiro, selecione a data e o horário da sala.";
+  }else if(!hasProfessional || !hasEmail){
+    confirmHintEl.textContent="Agora informe o nome e o e-mail do profissional para confirmar.";
+  }else{
+    confirmHintEl.textContent="Tudo pronto. Confirme o agendamento da sala.";
+  }
+}
 
-/* REALTIME */
+function renderSummary(){
+  if(selectedDate && selectedTime){
+    summaryEl.innerHTML=`<div class="label">Horário da sala</div><strong>${formatDate(selectedDate)} · ${selectedTime}</strong>`;
+  }else if(selectedDate){
+    summaryEl.innerHTML=`<div class="label">Data selecionada</div><strong>${formatDate(selectedDate)}</strong>`;
+  }else{
+    summaryEl.innerHTML=`<div class="label">Horário da sala</div><strong>Selecione uma data e horário.</strong>`;
+  }
+
+  const selectedReservations=selectedDate ? reservations.filter(r=>r.reservation_date===key(selectedDate)) : [];
+  listEl.innerHTML=selectedReservations.map(r=>`
+    <div class="reservation">
+      <b>${r.start_time.slice(0,5)}</b> · ${escapeHtml(r.name)}
+      <br><button type="button" class="cancel" data-id="${r.id}">Cancelar</button>
+    </div>
+  `).join("") || `<span class="empty">Nenhuma reserva para esta data.</span>`;
+
+  listEl.querySelectorAll(".cancel").forEach(btn=>{
+    btn.addEventListener("click",()=>cancelReservation(btn.dataset.id,btn));
+  });
+}
+
+function render(){renderCalendar();renderSlots();}
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+}
+
+document.getElementById("prevMonth").addEventListener("click",()=>{
+  const previous=new Date(viewMonth.getFullYear(),viewMonth.getMonth()-1,1);
+  if(previous < new Date(today.getFullYear(),today.getMonth(),1)) return;
+  viewMonth=previous; selectedDate=null; selectedTime=null; clearMessage(); render();
+});
+document.getElementById("nextMonth").addEventListener("click",()=>{
+  viewMonth=new Date(viewMonth.getFullYear(),viewMonth.getMonth()+1,1);
+  selectedDate=null; selectedTime=null; clearMessage(); render();
+});
+
+nameEl.addEventListener("input", updateConfirmState);
+emailEl.addEventListener("input", updateConfirmState);
+
+document.querySelectorAll("[data-scroll]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.getElementById(btn.dataset.scroll)?.scrollIntoView({behavior:"smooth",block:"start"});
+  });
+});
+
+reserveEl.addEventListener("click", async ()=>{
+  clearMessage();
+  if(!selectedDate || !selectedTime){message("Selecione a data e o horário.");return;}
+  if(isWeekend(selectedDate)){message("Não é possível agendar aos sábados e domingos.");return;}
+  const name=nameEl.value.trim(), email=emailEl.value.trim().toLowerCase();
+  if(!name || !email){message("Informe o nome do profissional e o e-mail.");return;}
+
+  const now=new Date();
+  if(key(selectedDate)===key(now)){
+    const [h,m]=selectedTime.split(":").map(Number);
+    if(h*60+m <= now.getHours()*60+now.getMinutes()){
+      message("Esse horário já passou."); selectedTime=null; renderSlots(); return;
+    }
+  }
+
+  reserveEl.disabled=true; reserveEl.textContent="Reservando...";
+  try{
+    const result=await db.rpc("create_reservation",{
+  p_room_id:1,
+  p_reservation_date:key(selectedDate),
+  p_start_time:selectedTime+":00",
+  p_name:name,
+  p_email:email
+  });
+    if(result.error){
+      if(result.error.code==="23505") message("Esse horário já foi reservado.");
+      else message("Erro ao reservar: "+result.error.message);
+      return;
+    }
+    message("Reserva confirmada!",true);
+
+const emailResult = await db.functions.invoke("send-reservation-email", {
+  body: {
+    name: name,
+    email: email,
+    date: key(selectedDate),
+    time: selectedTime
+  }
+});
+
+if (emailResult.error) {
+  console.error("Erro ao enviar e-mail:", emailResult.error);
+} else {
+  console.log("E-mail enviado:", emailResult.data);
+}
+
+nameEl.value="";
+emailEl.value="";
+selectedTime=null;
+
+await load();
+  }catch(error){
+    console.error(error); message("Erro inesperado ao fazer a reserva.");
+  }finally{
+    reserveEl.textContent="Confirmar agendamento →";
+    updateConfirmState();
+  }
+});
+
+async function cancelReservation(id,btn){
+  const reservation=reservations.find(r=>r.id===id);
+  if(!reservation) return;
+  const email=prompt(`Para cancelar a reserva de ${reservation.name}, informe o e-mail utilizado na reserva:`);
+  if(email===null) return;
+  const normalized=email.trim().toLowerCase();
+  if(!normalized){message("Informe o e-mail usado na reserva.");return;}
+  btn.disabled=true; btn.textContent="Cancelando...";
+  const result=await db.rpc("cancel_reservation",{p_reservation_id:reservation.id,p_email:normalized});
+  if(result.error){
+    message("Erro ao cancelar: "+result.error.message);
+    btn.disabled=false; btn.textContent="Cancelar"; return;
+  }
+  if(!result.data){
+    message("Não foi possível cancelar. Confira o e-mail informado.");
+    btn.disabled=false; btn.textContent="Cancelar"; return;
+  }
+  message("Reserva cancelada.",true); selectedTime=null; await load();
+}
+
+async function load(){
+  const result=await db.from("reservations")
+    .select("id,reservation_date,start_time,name")
+    .order("reservation_date").order("start_time");
+  if(result.error){console.error(result.error);message("Erro ao carregar reservas: "+result.error.message);render();return;}
+  reservations=result.data||[];
+  render();
+}
+
+render();
+updateConfirmState();
+load();
 
 db.channel("reservas")
-
-  .on(
-    "postgres_changes",
-    {
-      event:"*",
-      schema:"public",
-      table:"reservations"
-    },
-    () => load()
-  )
-
+  .on("postgres_changes",{event:"*",schema:"public",table:"reservations"},()=>load())
   .subscribe();
-
 </script>
-
 </body>
 </html>
