@@ -100,6 +100,38 @@ button{cursor:pointer}
 }
 .menu strong{display:block;font-size:14px}.menu span{display:block;margin-top:3px;font-size:11px;line-height:1.35;color:rgba(255,255,255,.68)}
 .arrow{font-size:20px;color:rgba(255,255,255,.6)}
+
+.login-overlay{
+  position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;
+  padding:20px;background:rgba(57,43,42,.38);backdrop-filter:blur(5px)
+}
+.login-card{
+  width:min(420px,100%);background:var(--paper);border:1px solid rgba(116,59,57,.12);
+  border-radius:24px;box-shadow:0 24px 70px rgba(73,39,34,.22);padding:28px
+}
+.login-brand{font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--rose);font-weight:800}
+.login-card h2{margin:7px 0 6px;color:var(--wine);font-size:25px}
+.login-card p{margin:0 0 20px;color:var(--muted);font-size:12px;line-height:1.5}
+.login-card label{margin-top:13px}
+.login-actions{margin-top:18px}
+.login-btn,.logout-btn{
+  width:100%;border:0;border-radius:15px;padding:13px 16px;color:#fff;
+  background:linear-gradient(135deg,#713936,#965548);font-weight:800
+}
+.login-btn:disabled{opacity:.5;cursor:not-allowed}
+.login-msg{margin-top:12px;border-radius:12px;padding:11px;font-size:12px;display:none}
+.login-msg.show{display:block}
+.login-msg.err{background:#fff0ef;color:var(--danger)}
+.user-session{
+  display:flex;align-items:center;gap:10px;margin-top:18px;padding-top:16px;
+  border-top:1px solid rgba(255,255,255,.16)
+}
+.user-session-info{min-width:0;flex:1}
+.user-session-info strong{display:block;font-size:13px}
+.user-session-info span{display:block;font-size:10px;color:rgba(255,255,255,.68);overflow:hidden;text-overflow:ellipsis}
+.logout-btn{width:auto;padding:8px 11px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.10);font-size:11px}
+.auth-hidden{display:none!important}
+
 .side-note{position:absolute;z-index:1;left:26px;right:26px;bottom:25px;border-top:1px solid rgba(255,255,255,.16);padding-top:15px;color:rgba(255,255,255,.63);font-size:11px;line-height:1.5}
 
 .main{padding:0;min-height:650px}
@@ -180,15 +212,18 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
   border-radius:9px;padding:6px 9px;font-size:11px
 }
 .cancel:hover{background:#fdeae7}
-.password-panel{
-  margin-top:24px;padding-top:20px;border-top:1px solid var(--line)
-}
-.password-panel h3{margin:0 0 6px;font-size:14px}
-.password-panel>p{margin:0 0 12px;font-size:11px;line-height:1.45;color:var(--muted)}
-.password-panel label{margin-top:10px}
-.password-btn{margin-top:14px}
-.password-panel .msg{margin-top:12px}
 .empty{color:var(--muted);font-size:11px}
+.password-panel{margin-top:27px;padding-top:20px;border-top:1px solid var(--line)}
+.password-panel h3{margin:0 0 7px;font-size:14px}
+.password-panel>p{margin:0 0 14px;font-size:11px;line-height:1.5;color:var(--muted)}
+.password-panel label{margin-top:10px}
+.password-btn{width:100%;margin-top:14px;border:0;border-radius:15px;padding:13px 16px;color:#fff;background:linear-gradient(135deg,#713936,#965548);font-weight:800}
+.password-btn:disabled{opacity:.45;cursor:not-allowed}
+.password-msg{margin-top:12px;border-radius:12px;padding:11px;font-size:12px;display:none}
+.password-msg.show{display:block}
+.password-msg.ok{background:#edf7f1;color:var(--ok)}
+.password-msg.err{background:#fff0ef;color:var(--danger)}
+
 @media(max-width:1100px){
   .layout{grid-template-columns:230px 1fr}
   .side-panel{grid-column:1/-1;min-height:auto}
@@ -227,6 +262,26 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
 </style>
 </head>
 <body>
+
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-brand">Agendamento MOVIMENTE</div>
+    <h2>Acesso do profissional</h2>
+    <p>Informe seu e-mail e senha para acessar a agenda.</p>
+
+    <label for="loginEmail">E-mail</label>
+    <input id="loginEmail" type="email" autocomplete="username" placeholder="seu@email.com">
+
+    <label for="loginPassword">Senha</label>
+    <input id="loginPassword" type="password" autocomplete="current-password" placeholder="Sua senha">
+
+    <div class="login-actions">
+      <button class="login-btn" id="loginBtn" type="button">Entrar →</button>
+    </div>
+    <div class="login-msg" id="loginMsg"></div>
+  </div>
+</div>
+
 <div class="page">
   <header class="brandbar">
     <div class="brand-title">
@@ -243,6 +298,14 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
         <h2>Área do profissional</h2>
         <p>Agende a sala para sua terapia.</p>
       </div>
+
+      <div class="user-session" id="userSession">
+        <div class="user-session-info">
+          <strong id="sessionName"></strong>
+          <span id="sessionEmail"></span>
+        </div>
+        <button class="logout-btn" id="logoutBtn" type="button">Sair</button>
+      </div>
       <nav class="menu" aria-label="Menu">
         <button type="button" data-scroll="agenda">
           <div class="icon">📅</div>
@@ -254,14 +317,14 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
           <div><strong>Cancelar agendamento</strong><span>Cancele uma reserva usando o e-mail informado.</span></div>
           <div class="arrow">›</div>
         </button>
-        <button type="button" data-scroll="senha">
-          <div class="icon">🔑</div>
-          <div><strong>Alterar senha</strong><span>Defina uma nova senha para acessar o sistema.</span></div>
-          <div class="arrow">›</div>
-        </button>
         <button type="button" data-scroll="info">
           <div class="icon">i</div>
           <div><strong>Informações</strong><span>Consulte horários, regras e disponibilidade da sala.</span></div>
+          <div class="arrow">›</div>
+        </button>
+        <button type="button" data-scroll="password">
+          <div class="icon">🔑</div>
+          <div><strong>Alterar senha</strong><span>Defina uma nova senha para seu acesso.</span></div>
           <div class="arrow">›</div>
         </button>
       </nav>
@@ -317,10 +380,10 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
         </div>
 
         <label for="name">Profissional</label>
-        <input id="name" autocomplete="name" placeholder="Nome do profissional">
+        <input id="name" autocomplete="name" placeholder="Nome do profissional" readonly>
 
         <label for="email">E-mail</label>
-        <input id="email" type="email" autocomplete="email" placeholder="seu@email.com">
+        <input id="email" type="email" autocomplete="email" placeholder="seu@email.com" readonly>
 
         <div class="confirm-area" id="confirmArea" aria-live="polite">
           <div class="confirm-hint" id="confirmHint">Selecione um horário e preencha seus dados para confirmar.</div>
@@ -333,15 +396,15 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
           <div id="list"><span class="empty">Nenhuma reserva para esta data.</span></div>
         </div>
 
-        <div class="password-panel" id="senha">
+        <div class="password-panel" id="password">
           <h3>Alterar senha</h3>
-          <p>Informe uma nova senha para continuar usando seu acesso.</p>
+          <p>Crie uma nova senha para o seu acesso ao Agendamento MOVIMENTE.</p>
           <label for="newPassword">Nova senha</label>
           <input id="newPassword" type="password" autocomplete="new-password" placeholder="Nova senha">
           <label for="confirmPassword">Confirmar nova senha</label>
           <input id="confirmPassword" type="password" autocomplete="new-password" placeholder="Repita a nova senha">
-          <button class="confirm password-btn" id="changePassword" type="button" disabled>Salvar nova senha</button>
-          <div class="msg" id="passwordMsg"></div>
+          <button class="password-btn" id="changePassword" type="button" disabled>Salvar nova senha</button>
+          <div class="password-msg" id="passwordMsg" aria-live="polite"></div>
         </div>
       </div>
     </aside>
@@ -365,6 +428,15 @@ const confirmAreaEl = document.getElementById("confirmArea");
 const confirmHintEl = document.getElementById("confirmHint");
 const msgEl = document.getElementById("msg");
 const listEl = document.getElementById("list");
+
+const loginOverlay = document.getElementById("loginOverlay");
+const loginEmailEl = document.getElementById("loginEmail");
+const loginPasswordEl = document.getElementById("loginPassword");
+const loginBtnEl = document.getElementById("loginBtn");
+const loginMsgEl = document.getElementById("loginMsg");
+const sessionNameEl = document.getElementById("sessionName");
+const sessionEmailEl = document.getElementById("sessionEmail");
+const logoutBtnEl = document.getElementById("logoutBtn");
 const newPasswordEl = document.getElementById("newPassword");
 const confirmPasswordEl = document.getElementById("confirmPassword");
 const changePasswordEl = document.getElementById("changePassword");
@@ -376,12 +448,16 @@ const times = [
   "16:59","17:59","18:59","19:59","20:59"
 ];
 
+const SESSION_KEY = "movimente_professional_token";
+
 const today = new Date();
 today.setHours(0,0,0,0);
 let viewMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 let selectedDate = null;
 let selectedTime = null;
 let reservations = [];
+let currentProfessional = null;
+let initializing = true;
 
 const key = d => {
   const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,"0"), day=String(d.getDate()).padStart(2,"0");
@@ -400,6 +476,216 @@ function clearMessage(){
   msgEl.textContent="";
   msgEl.className="msg";
   confirmAreaEl.classList.remove("success");
+}
+
+function loginMessage(text){
+  loginMsgEl.textContent=text;
+  loginMsgEl.className="login-msg show err";
+}
+function clearLoginMessage(){
+  loginMsgEl.textContent="";
+  loginMsgEl.className="login-msg";
+}
+
+function passwordMessage(text, ok=false){
+  passwordMsgEl.textContent=text;
+  passwordMsgEl.className="password-msg show "+(ok?"ok":"err");
+}
+function clearPasswordMessage(){
+  passwordMsgEl.textContent="";
+  passwordMsgEl.className="password-msg";
+}
+function updatePasswordState(){
+  const newPassword=newPasswordEl.value;
+  const confirmPassword=confirmPasswordEl.value;
+  const ready=Boolean(currentProfessional) && newPassword.length>0 && confirmPassword.length>0 && newPassword===confirmPassword;
+  changePasswordEl.disabled=!ready;
+  if(confirmPassword && newPassword!==confirmPassword) passwordMessage("As senhas não conferem.");
+  else clearPasswordMessage();
+}
+async function changePassword(){
+  clearPasswordMessage();
+  if(!currentProfessional || !currentProfessional.email){
+    passwordMessage("Não foi possível identificar o profissional autenticado.");
+    return;
+  }
+  const newPassword=newPasswordEl.value;
+  const confirmPassword=confirmPasswordEl.value;
+  if(!newPassword || !confirmPassword){
+    passwordMessage("Preencha os dois campos de senha.");
+    return;
+  }
+  if(newPassword!==confirmPassword){
+    passwordMessage("As senhas não conferem.");
+    return;
+  }
+  changePasswordEl.disabled=true;
+  changePasswordEl.textContent="Salvando...";
+  try{
+    const result=await db.rpc("definir_senha_profissional",{
+      p_email:currentProfessional.email.trim().toLowerCase(),
+      p_senha:newPassword
+    });
+    if(result.error){
+      console.error("Erro ao alterar senha:",result.error);
+      passwordMessage("Erro ao alterar a senha: "+result.error.message);
+      return;
+    }
+    if(result.data!==true){
+      passwordMessage("Não foi possível alterar a senha.");
+      return;
+    }
+    newPasswordEl.value="";
+    confirmPasswordEl.value="";
+    passwordMessage("Senha alterada com sucesso.",true);
+  }catch(error){
+    console.error(error);
+    passwordMessage("Erro inesperado ao alterar a senha.");
+  }finally{
+    changePasswordEl.textContent="Salvar nova senha";
+    updatePasswordState();
+  }
+}
+
+function showLogin(){
+  loginOverlay.classList.remove("auth-hidden");
+  loginEmailEl.focus();
+}
+function hideLogin(){
+  loginOverlay.classList.add("auth-hidden");
+}
+
+function applyProfessional(professional){
+  currentProfessional = professional;
+  nameEl.value = professional.professional_name || "";
+  emailEl.value = (professional.email || "").toLowerCase();
+  sessionNameEl.textContent = professional.professional_name || professional.email;
+  sessionEmailEl.textContent = professional.email || "";
+  updateConfirmState();
+  updatePasswordState();
+}
+
+function clearProfessional(){
+  currentProfessional = null;
+  nameEl.value = "";
+  emailEl.value = "";
+  sessionNameEl.textContent = "";
+  sessionEmailEl.textContent = "";
+  updateConfirmState();
+}
+
+async function validateSession(token){
+  const result = await db.rpc("validar_sessao_profissional",{p_token:token});
+  if(result.error){
+    console.error("Erro ao validar sessão:",result.error);
+    return null;
+  }
+  const row = Array.isArray(result.data) ? result.data[0] : result.data;
+  return row || null;
+}
+
+async function login(){
+  const email = loginEmailEl.value.trim().toLowerCase();
+  const senha = loginPasswordEl.value;
+
+  clearLoginMessage();
+
+  if(!email || !loginEmailEl.checkValidity()){
+    loginMessage("Informe um e-mail válido.");
+    return;
+  }
+  if(!senha){
+    loginMessage("Informe sua senha.");
+    return;
+  }
+
+  loginBtnEl.disabled=true;
+  loginBtnEl.textContent="Entrando...";
+
+  try{
+    const result = await db.rpc("criar_sessao_profissional",{
+      p_email:email,
+      p_senha:senha
+    });
+
+    if(result.error){
+      console.error("Erro de autenticação:",result.error);
+      loginMessage(result.error.message || "Não foi possível entrar.");
+      return;
+    }
+
+    const row = Array.isArray(result.data) ? result.data[0] : result.data;
+
+    if(!row || !row.token){
+      loginMessage("E-mail ou senha inválidos.");
+      return;
+    }
+
+    localStorage.setItem(SESSION_KEY,row.token);
+    applyProfessional({
+      professional_name:row.professional_name,
+      email:row.email
+    });
+
+    loginPasswordEl.value="";
+    clearLoginMessage();
+    hideLogin();
+    await load();
+  }catch(error){
+    console.error(error);
+    loginMessage("Erro inesperado ao entrar.");
+  }finally{
+    loginBtnEl.disabled=false;
+    loginBtnEl.textContent="Entrar →";
+  }
+}
+
+async function logout(){
+  const token=localStorage.getItem(SESSION_KEY);
+
+  if(token){
+    try{
+      await db.rpc("encerrar_sessao_profissional",{p_token:token});
+    }catch(error){
+      console.error("Erro ao encerrar sessão:",error);
+    }
+  }
+
+  localStorage.removeItem(SESSION_KEY);
+  clearProfessional();
+  newPasswordEl.value="";
+  confirmPasswordEl.value="";
+  clearPasswordMessage();
+  selectedDate=null;
+  selectedTime=null;
+  reservations=[];
+  clearMessage();
+  render();
+  showLogin();
+}
+
+async function initializeAuth(){
+  const token=localStorage.getItem(SESSION_KEY);
+
+  if(!token){
+    initializing=false;
+    showLogin();
+    return;
+  }
+
+  const professional=await validateSession(token);
+
+  if(!professional){
+    localStorage.removeItem(SESSION_KEY);
+    initializing=false;
+    showLogin();
+    return;
+  }
+
+  applyProfessional(professional);
+  initializing=false;
+  hideLogin();
+  await load();
 }
 
 function renderCalendar(){
@@ -467,17 +753,17 @@ function renderSlots(){
 
 function updateConfirmState(){
   const hasDateTime=Boolean(selectedDate && selectedTime);
-  const hasProfessional=nameEl.value.trim().length>0;
-  const hasEmail=emailEl.value.trim().length>0 && emailEl.checkValidity();
-  const ready=hasDateTime && hasProfessional && hasEmail;
+  const hasProfessional=Boolean(currentProfessional && nameEl.value.trim());
+  const hasEmail=Boolean(currentProfessional && emailEl.value.trim() && emailEl.checkValidity());
+  const ready=hasDateTime && hasProfessional && hasEmail && !initializing;
 
   confirmAreaEl.classList.toggle("ready",ready);
   reserveEl.disabled=!ready;
 
   if(!hasDateTime){
     confirmHintEl.textContent="Primeiro, selecione a data e o horário da sala.";
-  }else if(!hasProfessional || !hasEmail){
-    confirmHintEl.textContent="Agora informe o nome e o e-mail do profissional para confirmar.";
+  }else if(!currentProfessional){
+    confirmHintEl.textContent="Entre com seu e-mail e senha para confirmar.";
   }else{
     confirmHintEl.textContent="Tudo pronto. Confirme o agendamento da sala.";
   }
@@ -505,79 +791,6 @@ function renderSummary(){
   });
 }
 
-function passwordMessage(text, ok=false){
-  passwordMsgEl.textContent=text;
-  passwordMsgEl.className="msg show "+(ok?"ok":"err");
-}
-
-function clearPasswordMessage(){
-  passwordMsgEl.textContent="";
-  passwordMsgEl.className="msg";
-}
-
-function updatePasswordState(){
-  const newPassword=newPasswordEl.value;
-  const confirmPassword=confirmPasswordEl.value;
-  const ready=newPassword.length>0 && confirmPassword.length>0 && newPassword===confirmPassword;
-  changePasswordEl.disabled=!ready;
-  if(confirmPassword && newPassword!==confirmPassword){
-    passwordMessage("As senhas não conferem.");
-  }else{
-    clearPasswordMessage();
-  }
-}
-
-async function changePassword(){
-  clearPasswordMessage();
-  const email=emailEl.value.trim().toLowerCase();
-  const newPassword=newPasswordEl.value;
-  const confirmPassword=confirmPasswordEl.value;
-
-  if(!email){
-    passwordMessage("Não foi possível identificar o e-mail do profissional.");
-    return;
-  }
-  if(!newPassword || !confirmPassword){
-    passwordMessage("Preencha os dois campos de senha.");
-    return;
-  }
-  if(newPassword!==confirmPassword){
-    passwordMessage("As senhas não conferem.");
-    return;
-  }
-
-  changePasswordEl.disabled=true;
-  changePasswordEl.textContent="Salvando...";
-
-  try{
-    const result=await db.rpc("definir_senha_profissional",{
-      p_email:email,
-      p_senha:newPassword
-    });
-
-    if(result.error){
-      console.error(result.error);
-      passwordMessage("Erro ao alterar a senha: "+result.error.message);
-      return;
-    }
-
-    if(result.data!==true){
-      passwordMessage("Não foi possível alterar a senha.");
-      return;
-    }
-
-    newPasswordEl.value="";
-    confirmPasswordEl.value="";
-    passwordMessage("Senha alterada com sucesso.",true);
-  }catch(error){
-    console.error(error);
-    passwordMessage("Erro inesperado ao alterar a senha.");
-  }finally{
-    changePasswordEl.textContent="Salvar nova senha";
-    updatePasswordState();
-  }
-}
-
 function render(){renderCalendar();renderSlots();}
 
 function escapeHtml(value){
@@ -594,24 +807,40 @@ document.getElementById("nextMonth").addEventListener("click",()=>{
   selectedDate=null; selectedTime=null; clearMessage(); render();
 });
 
-nameEl.addEventListener("input", updateConfirmState);
-emailEl.addEventListener("input", updateConfirmState);
-newPasswordEl.addEventListener("input", updatePasswordState);
-confirmPasswordEl.addEventListener("input", updatePasswordState);
-changePasswordEl.addEventListener("click", changePassword);
-
 document.querySelectorAll("[data-scroll]").forEach(btn=>{
   btn.addEventListener("click",()=>{
     document.getElementById(btn.dataset.scroll)?.scrollIntoView({behavior:"smooth",block:"start"});
   });
 });
 
+loginBtnEl.addEventListener("click",login);
+loginPasswordEl.addEventListener("keydown",e=>{
+  if(e.key==="Enter") login();
+});
+loginEmailEl.addEventListener("keydown",e=>{
+  if(e.key==="Enter") login();
+});
+logoutBtnEl.addEventListener("click",logout);
+newPasswordEl.addEventListener("input",updatePasswordState);
+confirmPasswordEl.addEventListener("input",updatePasswordState);
+changePasswordEl.addEventListener("click",changePassword);
+
 reserveEl.addEventListener("click", async ()=>{
   clearMessage();
+
+  if(!currentProfessional){
+    message("Faça login para agendar.");
+    showLogin();
+    return;
+  }
+
   if(!selectedDate || !selectedTime){message("Selecione a data e o horário.");return;}
   if(isWeekend(selectedDate)){message("Não é possível agendar aos sábados e domingos.");return;}
-  const name=nameEl.value.trim(), email=emailEl.value.trim().toLowerCase();
-  if(!name || !email){message("Informe o nome do profissional e o e-mail.");return;}
+
+  const name=currentProfessional.professional_name?.trim();
+  const email=currentProfessional.email?.trim().toLowerCase();
+
+  if(!name || !email){message("Não foi possível identificar o profissional.");return;}
 
   const now=new Date();
   if(key(selectedDate)===key(now)){
@@ -621,44 +850,32 @@ reserveEl.addEventListener("click", async ()=>{
     }
   }
 
-  reserveEl.disabled=true; reserveEl.textContent="Reservando...";
+  reserveEl.disabled=true;
+  reserveEl.textContent="Reservando...";
+
   try{
-    const result=await db.rpc("create_reservation",{
-  p_room_id:1,
-  p_reservation_date:key(selectedDate),
-  p_start_time:selectedTime+":00",
-  p_name:name,
-  p_email:email
-  });
+    const result=await db.rpc("create_reservation", {
+      p_room_id:1,
+      p_reservation_date:key(selectedDate),
+      p_start_time:selectedTime+":00",
+      p_name:name,
+      p_email:email
+    });
+
     if(result.error){
       if(result.error.code==="23505") message("Esse horário já foi reservado.");
       else message("Erro ao reservar: "+result.error.message);
       return;
     }
+
     message("Reserva confirmada!",true);
-
-const emailResult = await db.functions.invoke("send-reservation-email", {
-  body: {
-    name: name,
-    email: email,
-    date: key(selectedDate),
-    time: selectedTime
-  }
-});
-
-if (emailResult.error) {
-  console.error("Erro ao enviar e-mail:", emailResult.error);
-} else {
-  console.log("E-mail enviado:", emailResult.data);
-}
-
-nameEl.value="";
-emailEl.value="";
-selectedTime=null;
-
-await load();
+    nameEl.value=currentProfessional.professional_name || "";
+    emailEl.value=currentProfessional.email || "";
+    selectedTime=null;
+    await load();
   }catch(error){
-    console.error(error); message("Erro inesperado ao fazer a reserva.");
+    console.error(error);
+    message("Erro inesperado ao fazer a reserva.");
   }finally{
     reserveEl.textContent="Confirmar agendamento →";
     updateConfirmState();
@@ -668,39 +885,67 @@ await load();
 async function cancelReservation(id,btn){
   const reservation=reservations.find(r=>r.id===id);
   if(!reservation) return;
-  const email=prompt(`Para cancelar a reserva de ${reservation.name}, informe o e-mail utilizado na reserva:`);
-  if(email===null) return;
-  const normalized=email.trim().toLowerCase();
-  if(!normalized){message("Informe o e-mail usado na reserva.");return;}
-  btn.disabled=true; btn.textContent="Cancelando...";
-  const result=await db.rpc("cancel_reservation",{p_reservation_id:reservation.id,p_email:normalized});
+
+  if(!currentProfessional){
+    message("Faça login para cancelar.");
+    showLogin();
+    return;
+  }
+
+  btn.disabled=true;
+  btn.textContent="Cancelando...";
+
+  const result=await db.rpc("cancel_reservation",{
+    p_reservation_id:reservation.id,
+    p_email:currentProfessional.email.trim().toLowerCase()
+  });
+
   if(result.error){
     message("Erro ao cancelar: "+result.error.message);
-    btn.disabled=false; btn.textContent="Cancelar"; return;
+    btn.disabled=false;
+    btn.textContent="Cancelar";
+    return;
   }
+
   if(!result.data){
-    message("Não foi possível cancelar. Confira o e-mail informado.");
-    btn.disabled=false; btn.textContent="Cancelar"; return;
+    message("Não foi possível cancelar. Essa reserva não pertence ao profissional autenticado.");
+    btn.disabled=false;
+    btn.textContent="Cancelar";
+    return;
   }
-  message("Reserva cancelada.",true); selectedTime=null; await load();
+
+  message("Reserva cancelada.",true);
+  selectedTime=null;
+  await load();
 }
 
 async function load(){
   const result=await db.from("reservations")
     .select("id,reservation_date,start_time,name")
     .order("reservation_date").order("start_time");
-  if(result.error){console.error(result.error);message("Erro ao carregar reservas: "+result.error.message);render();return;}
+
+  if(result.error){
+    console.error(result.error);
+    message("Erro ao carregar reservas: "+result.error.message);
+    render();
+    return;
+  }
+
   reservations=result.data||[];
   render();
 }
 
 render();
 updateConfirmState();
-load();
+initializeAuth();
 
 db.channel("reservas")
   .on("postgres_changes",{event:"*",schema:"public",table:"reservations"},()=>load())
   .subscribe();
+</script>
+</body>
+</html>
+
 </script>
 </body>
 </html>
