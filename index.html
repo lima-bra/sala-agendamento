@@ -217,12 +217,14 @@ input:focus{border-color:#b67866;box-shadow:0 0 0 3px rgba(182,120,102,.12)}
 .password-panel h3{margin:0 0 7px;font-size:14px}
 .password-panel>p{margin:0 0 14px;font-size:11px;line-height:1.5;color:var(--muted)}
 .password-panel label{margin-top:10px}
-.password-btn{width:100%;margin-top:14px;border:0;border-radius:15px;padding:13px 16px;color:#fff;background:linear-gradient(135deg,#713936,#965548);font-weight:800}
-.password-btn:disabled{opacity:.45;cursor:not-allowed}
-.password-msg{margin-top:12px;border-radius:12px;padding:11px;font-size:12px;display:none}
+.password-btn{width:100%;margin-top:14px;border:0;border-radius:15px;padding:14px 17px;color:#fff;background:linear-gradient(135deg,#713936,#965548);font-weight:800;box-shadow:0 10px 22px rgba(116,59,57,.17)}
+.password-btn:disabled{opacity:.45;cursor:not-allowed;box-shadow:none}
+.password-msg{margin-top:14px;border-radius:15px;padding:14px 17px;font-size:13px;font-weight:800;display:none;width:100%;text-align:center}
 .password-msg.show{display:block}
 .password-msg.ok{background:#edf7f1;color:var(--ok)}
 .password-msg.err{background:#fff0ef;color:var(--danger)}
+.password-panel.success .password-btn{display:none}
+.password-panel.success .password-msg{display:block}
 
 @media(max-width:1100px){
   .layout{grid-template-columns:230px 1fr}
@@ -441,6 +443,7 @@ const newPasswordEl = document.getElementById("newPassword");
 const confirmPasswordEl = document.getElementById("confirmPassword");
 const changePasswordEl = document.getElementById("changePassword");
 const passwordMsgEl = document.getElementById("passwordMsg");
+const passwordPanelEl = document.getElementById("password");
 
 const times = [
   "06:59","07:59","08:59","09:59","10:59",
@@ -490,10 +493,12 @@ function clearLoginMessage(){
 function passwordMessage(text, ok=false){
   passwordMsgEl.textContent=text;
   passwordMsgEl.className="password-msg show "+(ok?"ok":"err");
+  passwordPanelEl.classList.toggle("success",ok);
 }
 function clearPasswordMessage(){
   passwordMsgEl.textContent="";
   passwordMsgEl.className="password-msg";
+  passwordPanelEl.classList.remove("success");
 }
 function updatePasswordState(){
   const newPassword=newPasswordEl.value;
