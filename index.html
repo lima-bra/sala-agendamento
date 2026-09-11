@@ -543,7 +543,7 @@ async function changePassword(){
     passwordMessage("Erro inesperado ao alterar a senha.");
   }finally{
     changePasswordEl.textContent="Salvar nova senha";
-    updatePasswordState();
+    changePasswordEl.disabled=true;
   }
 }
 
